@@ -37,7 +37,16 @@
 #include "lwip/stats.h"
 #include "lwip/snmp.h"
 #include "netif/etharp.h"
+
+#include "lwip/init.h"
+
+#if LWIP_VERSION == (1U << 24 | 4U << 16 | 1U << 8 | 0U)
 #include "netif/ppp_oe.h"
+#else
+/* code for lwip version 2.0.0 (development) */
+#include "netif/ppp/pppoe.h"
+#include "lwip/snmp.h"
+#endif /*  LWIP_VERSION == CIAA_LWIP_141 */
 
 #include "lpc_18xx43xx_emac_config.h"
 #include "arch/lpc18xx_43xx_emac.h"
