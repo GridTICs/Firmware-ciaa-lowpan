@@ -55,8 +55,13 @@
 #include "arch/lpc_arch.h"
 #include "netif/etharp.h"
 
+
 #include "lwip/init.h"
-#if LWIP_VERSION == (1U << 24 | 4U << 16 | 1U << 8 | 0U)
+#define	CIAA_LWIP_141	(1U << 24 | 4U << 16 | 1U << 8 | 0U)
+#define CIAA_LWIP_VERSION 	(LWIP_VERSION_MAJOR << 24   | \
+	LWIP_VERSION_MINOR << 16 |LWIP_VERSION_REVISION << 8 | LWIP_VERSION_RC)
+
+#if CIAA_LWIP_VERSION == CIAA_LWIP_141
 #include "netif/ppp_oe.h"
 #else
 /* code for lwip version 2.0.0 (development) */
@@ -66,9 +71,12 @@
 
 #include "lwip/netif.h"
 #include "lwip/init.h"
+
+#if LWIP_VERSION_MAJOR == 1U
 #include "lwip/timers.h"
-
-
+#else /* LWIP_VERSION_MAJOR == 1U */
+#include "lwip/timeouts.h"
+#endif /* LWIP_VERSION_MAJOR == 1U */
 /*==================[macros and definitions]=================================*/
 
 /*==================[internal data declaration]==============================*/
@@ -76,7 +84,6 @@
 static struct netif lpc_netif;
 
 static uint32_t physts;
-static ip_addr_t ipaddr, netmask, gw;
 
 static const PINMUX_GRP_T pinmuxing[] = {
    /* RMII pin group */
@@ -116,6 +123,8 @@ static void prvSetupHardware(void)
 
 void ciaaDriverEth_init(void)
 {
+    static ip_addr_t ipaddr, netmask, gw;
+
    /* init Ethernet Hardware */
    prvSetupHardware();
 
@@ -133,10 +142,42 @@ void ciaaDriverEth_init(void)
    IP4_ADDR(&netmask, 255, 255, 255, 0);
 #endif
 
+#ifdef FOO_NONE
+/*  el prototipo en 1.4.1 era */
+netif_add(
+    struct netif *netif,
+    ip_addr_t *ipaddr,  /* FIXME: en la lógica del código se admite por conversión */
+    ip_addr_t *netmask, /* FIXME: en la lógica del código se admite por conversión */
+    ip_addr_t *gw,      /* FIXME: en la lógica del código se admite por conversión */
+    void *state,
+    err_t (* init)(struct netif *netif), /* FIXME: en la lógica del código se admite por conversión */
+    err_t (* input)(struct pbuf *p, struct netif *netif) /* FIXME: en la lógica del código se admite por conversión */
+)
+
+/* en 2.0.0 (y algunas anteriores) */
+netif_add(
+    struct netif *netif,
+    const ip4_addr_t *ipaddr,
+    const ip4_addr_t *netmask,
+    const ip4_addr_t *gw,
+    void *state,
+    netif_init_fn init,
+    netif_input_fn input
+)
+#endif
+
    /* Add netif interface for lpc17xx_8x */
    netif_add(&lpc_netif, &ipaddr, &netmask, &gw, NULL, lpc_enetif_init,
            ethernet_input);
    netif_set_default(&lpc_netif);
+#if CIAA_LWIP_VERSION != CIAA_LWIP_141
+/*  This is the hardware link state; e.g. whether cable is plugged for wired
+**  Ethernet interface. This function must be called even if you don't know
+**  the current state. Having link up and link down events is optional but
+**  DHCP and IPv6 discover benefit well from those events */
+   netif_set_link_up(&lpc_netif);
+#endif /* LWIP_VERSION != CIAA_LWIP_141 */
+
    netif_set_up(&lpc_netif);
 
 #if LWIP_DHCP

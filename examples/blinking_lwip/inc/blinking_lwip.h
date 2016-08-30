@@ -69,7 +69,13 @@
 #include "lwip/tcpip.h"
 #include "lwip/ip_addr.h"
 #include "lwip/netif.h"
+
+#if LWIP_VERSION_MAJOR == 1U
 #include "lwip/timers.h"
+#else /* LWIP_VERSION_MAJOR == 1U */
+#include "lwip/timeouts.h"
+#endif /* LWIP_VERSION_MAJOR == 1U */
+
 #include "netif/etharp.h"
 
 #if LWIP_DHCP
