@@ -1,0 +1,22 @@
+lwipopts.h  memory aligment for cortex m4 devices
+===================================================================
+diff -urN lwip/examples/blinking_lwip/inc/lwipopts.h lwip-ciaa/examples/blinking_lwip/inc/lwipopts.h
+--- lwip/examples/blinking_lwip/inc/lwipopts.h	2014-12-04 16:51:24.000000000 -0300
++++ lwip-ciaa/examples/blinking_lwip/inc/lwipopts.h	2016-09-29 13:55:28.313520407 -0300
+@@ -41,8 +41,15 @@
+ /* Need for memory protection */
+ #define SYS_LIGHTWEIGHT_PROT            0
+ 
++/* TODO cortexm4 tiene alineamiento por byte, pero el resto? 
++ * distinguir cuales  */
++#if 1
++/* 8-bit alignment */
++#define MEM_ALIGNMENT                   1
++#else
+ /* 32-bit alignment */
+-#define MEM_ALIGNMENT                   4
++#define MEM_ALIGNMENT                   0
++#endif
+ 
+ /* pbuf buffers in pool. In zero-copy mode, these buffers are
+    located in peripheral RAM. In copied mode, they are located in

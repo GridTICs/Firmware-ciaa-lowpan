@@ -41,8 +41,15 @@
 /* Need for memory protection */
 #define SYS_LIGHTWEIGHT_PROT            0
 
+/* TODO cortexm4 tiene alineamiento por byte, pero el resto? 
+ * distinguir cuales  */
+#if 1
+/* 8-bit alignment */
+#define MEM_ALIGNMENT                   1
+#else
 /* 32-bit alignment */
-#define MEM_ALIGNMENT                   4
+#define MEM_ALIGNMENT                   0
+#endif
 
 /* pbuf buffers in pool. In zero-copy mode, these buffers are
    located in peripheral RAM. In copied mode, they are located in
