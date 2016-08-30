@@ -48,7 +48,7 @@
 #define MEM_ALIGNMENT                   1
 #else
 /* 32-bit alignment */
-#define MEM_ALIGNMENT                   0
+#define MEM_ALIGNMENT                   4
 #endif
 
 /* pbuf buffers in pool. In zero-copy mode, these buffers are
