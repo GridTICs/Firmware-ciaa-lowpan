@@ -53,4 +53,5 @@ MODS ?= modules$(DS)posix           \
         modules$(DS)libs            \
         externals$(DS)lwip
 
-
+# para printf y debug
+LFLAGS += -lc -lrdimon

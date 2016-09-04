@@ -69,6 +69,25 @@
 #include "ciaak.h"            /* <= ciaa kernel header */
 #include "blinking_lwip.h"    /* <= own header */
 
+// test
+#include <stdio.h>
+#include<stdarg.h>
+
+void debug_printf(char *fmt, ...);
+
+void debug_printf(char *fmt, ...)
+{
+  char buf[100];
+  size_t len;
+  va_list args;
+  va_start(args, fmt);
+  len = snprintf(buf, 100, fmt, args);
+  va_end(args);
+  dbgPrint(buf);
+}
+
+#define MTS_PLATFORM_DIAG(x)   debug_printf x ;
+
 
 /*==================[macros and definitions]=================================*/
 
@@ -78,7 +97,11 @@ int fd_out;
 /*==================[internal functions declaration]=========================*/
 
 /*==================[internal data definition]===============================*/
-
+/** \brief File descriptor of the USB uart
+ *
+ * Device path /dev/serial/uart/1
+ */
+static int32_t fd_usb_uart;
 /*==================[external data definition]===============================*/
 
 /*==================[internal functions definition]==========================*/
@@ -110,6 +133,29 @@ TASK(InitTask)
 
    /* open CIAA digital outputs */
    fd_out = ciaaPOSIX_open("/dev/dio/out/0", ciaaPOSIX_O_RDWR);
+
+   /* open UART connected to USB bridge (FT2232) */
+   fd_usb_uart = ciaaPOSIX_open("/dev/serial/uart/1", ciaaPOSIX_O_RDWR);
+
+   /* change baud rate for uart usb */
+   ciaaPOSIX_ioctl(fd_usb_uart, ciaaPOSIX_IOCTL_SET_BAUDRATE, (void *)ciaaBAUDRATE_115200);
+
+   /* change FIFO TRIGGER LEVEL for uart usb */
+   ciaaPOSIX_ioctl(fd_usb_uart, ciaaPOSIX_IOCTL_SET_FIFO_TRIGGER_LEVEL, (void *)ciaaFIFO_TRIGGER_LEVEL3);
+
+   dbg_load_uart(&fd_usb_uart);
+
+   char message[] = "Hi! :)\nSerialEchoTask: Waiting for characters...\n";
+   // ciaaPOSIX_write(fd_usb_uart, message, ciaaPOSIX_strlen(message));
+   // dbg_send(message, ciaaPOSIX_strlen(message));
+   dbgPrint(message);
+   char buf[100];
+
+   sprintf(buf, "hola %d ", 5);
+   dbgPrint(buf);
+
+   MTS_PLATFORM_DIAG(("chau %d ", 5));
+   // dbgPrint(test);
 
    /* start TCP echo example */
    echo_init();

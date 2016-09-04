@@ -132,4 +132,14 @@ ALARM IncrementSWCounter {
    };
 };
 
+ISR UART2_IRQHandler {
+/* #if BOARD == ciaa_fsl */
+/*   INTERRUPT = UART5; */
+/* #else */
+   INTERRUPT = UART2;
+/* #endif */
+   CATEGORY = 2;
+   PRIORITY = 0;
+};
+
 };
