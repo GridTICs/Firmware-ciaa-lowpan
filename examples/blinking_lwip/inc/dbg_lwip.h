@@ -2,16 +2,22 @@
 
 #define LWIP_DBG_H
 
-int *fd_uart;
 
-void dbg_load_uart(int *uart);
+// int32_t
+// ciaaPOSIX_strlen()
+#include "ciaaPOSIX_string.h"
 
+/* loads uart file descriptor in the local file */
+void dbg_load_uart(int32_t *uart);
+
+/* sends to loaded  UART  */
 int dbg_send(void *data, int datalen);
 
-// #define dbgPrint(x) uartSend(1, (uint8_t *)(x), strlen(x))
-// #define dbgPrint(x) ciaaPOSIX_write(*fd_uart, (void *)(x),  ciaaPOSIX_strlen(x))
+/* printf in the loaded UART */
+void dbg_printf(char *fmt, ...);
 
 #define dbgPrint(x)	dbg_send((void*)(x), ciaaPOSIX_strlen(x))
 
+#define MTS_PLATFORM_DIAG(x)   dbg_printf x ;
 
 #endif

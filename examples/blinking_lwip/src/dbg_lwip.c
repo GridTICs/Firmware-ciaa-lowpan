@@ -1,20 +1,24 @@
 #include "dbg_lwip.h" 
 
+// ciaaPOSIX_write
+#include "ciaaPOSIX_stdio.h"
 
-int *fd_uart;
 
-void dbg_load_uart(int *uart)
+// vsprintf()
+#include <stdio.h>
+// va_start()
+#include <stdarg.h>
+
+
+int32_t *fd_uart;
+
+
+void dbg_load_uart(int32_t *uart)
 {
    fd_uart = uart;
    return;
 }
 
-
-/*
-On  success,  the  number  of bytes written is returned (zero indicates
-nothing was written).  On error, -1  is  returned,  and  errno  is  set
-appropriately
-*/
 
 int dbg_send(void *data, int datalen)
 {
@@ -22,3 +26,14 @@ int dbg_send(void *data, int datalen)
 }
 
 
+void dbg_printf(char *fmt, ...)
+{
+   char buf[100];
+   va_list args;
+   va_start(args, fmt);
+   vsprintf(buf, fmt, args);
+
+   dbg_send((void*)(buf), ciaaPOSIX_strlen(buf));
+   va_end(args);
+   return;
+}
