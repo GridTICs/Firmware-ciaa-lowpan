@@ -104,16 +104,79 @@
 #define LINK_STATS                      0
 #define LWIP_STATS_DISPLAY              0
 
+
+#define	LWIP_DEBUG 	1
+/**
+ * LWIP_DBG_MIN_LEVEL: After masking, the value of the debug is
+ * compared against this value. If it is smaller, then debugging
+ * messages are written.
+ */
+
+#define LWIP_DBG_MIN_LEVEL	LWIP_DBG_LEVEL_ALL
+
+/**
+ * LWIP_DBG_TYPES_ON: A mask that can be used to globally enable/disable
+ * debug messages of certain types.
+ */
+ #define LWIP_DBG_TYPES_ON               LWIP_DBG_ON
+#define LWIP_DBG_TYPES_ON               (( LWIP_DBG_ON | LWIP_DBG_TRACE | LWIP_DBG_STATE | LWIP_DBG_FRESH ))
+
+/*
+Symbolic constant LWIP_DBG_TYPES_ON can be modified in lwipopts.h file for the purposes to enable or disable some kind of messages. There is 4 values that can be ORed and assigned to LWIP_DBG_TYPES_ON:*/
+/* flag for LWIP_DEBUGF indicating a tracing message
+ * (to follow program flow) */
+// #define LWIP_DBG_TRACE         0x40U
+/* flag for LWIP_DEBUGF indicating a state debug message
+ * (to follow module states) */
+// #define LWIP_DBG_STATE         0x20U
+/* flag for LWIP_DEBUGF indicating newly added code,
+ * not thoroughly tested yet  */
+// #define LWIP_DBG_FRESH         0x10U
+/* flag for LWIP_DEBUGF to halt after printing
+ * this debug message  */
+// #define LWIP_DBG_HALT          0x08U
+
+
 /* There are more *_DEBUG options that can be selected.
    See opts.h. Make sure that LWIP_DEBUG is defined when
    building the code to use debug. */
 #define TCP_DEBUG                       LWIP_DBG_OFF
-#define ETHARP_DEBUG                    LWIP_DBG_OFF
-#define PBUF_DEBUG                      LWIP_DBG_OFF
-#define IP_DEBUG                        LWIP_DBG_OFF
-#define TCPIP_DEBUG                     LWIP_DBG_OFF
-#define DHCP_DEBUG                      LWIP_DBG_OFF
-#define UDP_DEBUG                       LWIP_DBG_OFF
+#define ETHARP_DEBUG                    LWIP_DBG_ON
+#define NETIF_DEBUG                     LWIP_DBG_ON
+#define PBUF_DEBUG                      LWIP_DBG_ON
+#define API_LIB_DEBUG                   LWIP_DBG_ON
+#define API_MSG_DEBUG                   LWIP_DBG_ON
+#define SOCKETS_DEBUG                   LWIP_DBG_ON
+#define ICMP_DEBUG                      LWIP_DBG_OFF
+#define IGMP_DEBUG                      LWIP_DBG_OFF
+#define INET_DEBUG                      LWIP_DBG_ON
+/**
+ * IP_REASS_DEBUG: Enable debugging in ip_frag.c for both frag & reass.
+ */
+#define IP_REASS_DEBUG                  LWIP_DBG_ON
+#define IP_DEBUG                        LWIP_DBG_ON
+#define RAW_DEBUG                       LWIP_DBG_ON
+#define MEM_DEBUG                       LWIP_DBG_ON
+#define MEMP_DEBUG                      LWIP_DBG_ON
+#define SYS_DEBUG                       LWIP_DBG_ON
+#define TIMERS_DEBUG                    LWIP_DBG_ON
+#define TCP_DEBUG                       LWIP_DBG_OFF
+#define TCP_INPUT_DEBUG                 LWIP_DBG_OFF
+#define TCP_FR_DEBUG                    LWIP_DBG_OFF
+#define TCP_RTO_DEBUG                   LWIP_DBG_OFF
+#define TCP_CWND_DEBUG                  LWIP_DBG_OFF
+#define TCP_WND_DEBUG                   LWIP_DBG_OFF
+#define TCP_OUTPUT_DEBUG                LWIP_DBG_OFF
+#define TCP_RST_DEBUG                   LWIP_DBG_OFF
+#define TCP_QLEN_DEBUG                  LWIP_DBG_OFF
+#define UDP_DEBUG                       LWIP_DBG_ON
+#define TCPIP_DEBUG                     LWIP_DBG_ON
+#define DHCP_DEBUG                      LWIP_DBG_ON
+#define AUTOIP_DEBUG                    LWIP_DBG_OFF
+#define SNMP_MSG_DEBUG                  LWIP_DBG_OFF
+#define SNMP_MIB_DEBUG                  LWIP_DBG_OFF
+#define DNS_DEBUG                       LWIP_DBG_OFF
+
 
 /* This define is custom for the LPC EMAC driver. Enabled it to
    get debug messages for the driver. */
