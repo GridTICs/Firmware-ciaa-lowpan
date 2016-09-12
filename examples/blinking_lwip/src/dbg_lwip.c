@@ -28,10 +28,11 @@ int dbg_send(void *data, int datalen)
 
 void dbg_printf(char *fmt, ...)
 {
-   char buf[100];
+#define DBG_PRINTF_BYTELIMIT	196
+   char buf[DBG_PRINTF_BYTELIMIT];
    va_list args;
    va_start(args, fmt);
-   vsprintf(buf, fmt, args);
+   vsnprintf(buf, DBG_PRINTF_BYTELIMIT, fmt, args);
 
    dbg_send((void*)(buf), ciaaPOSIX_strlen(buf));
    va_end(args);
