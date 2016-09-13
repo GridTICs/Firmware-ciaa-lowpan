@@ -129,11 +129,11 @@ TASK(InitTask)
 
    dbg_load_uart(&fd_usb_uart);
 
-   char message[] = "Hi! :)\nSerialEchoTask: Waiting for characters...\n";
+   char message[] = "Hi! :)\nWaiting for characters at port 7\n";
    // ciaaPOSIX_write(fd_usb_uart, message, ciaaPOSIX_strlen(message));
-   MTS_PLATFORM_DIAG(( message ));
+   // MTS_PLATFORM_DIAG(( message ));
    // dbg_send(message, ciaaPOSIX_strlen(message));
-   MTS_PLATFORM_DIAG(("chau %d ", 5));
+   MTS_PLATFORM_DIAG(("%s %d\n", message, 5));
 
    /* start TCP echo example */
    echo_init();

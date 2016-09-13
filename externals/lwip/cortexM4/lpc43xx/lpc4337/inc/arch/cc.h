@@ -107,7 +107,7 @@ void assert_printf(char *msg, int line, char *file);
 
 /* Plaform specific diagnostic output */
 #define LWIP_PLATFORM_DIAG(vars) dbg_printf vars
-#define LWIP_PLATFORM_ASSERT(flag) { assert_printf((flag), __LINE__, __FILE__); }
+#define LWIP_PLATFORM_ASSERT(flag) { dbg_printf(((flag), __LINE__, __FILE__)); }
 #else
 
 /**

@@ -118,7 +118,7 @@
  * LWIP_DBG_TYPES_ON: A mask that can be used to globally enable/disable
  * debug messages of certain types.
  */
- #define LWIP_DBG_TYPES_ON               LWIP_DBG_ON
+// #define LWIP_DBG_TYPES_ON               LWIP_DBG_ON
 #define LWIP_DBG_TYPES_ON               (( LWIP_DBG_ON | LWIP_DBG_TRACE | LWIP_DBG_STATE | LWIP_DBG_FRESH ))
 
 /*
@@ -174,7 +174,7 @@ Symbolic constant LWIP_DBG_TYPES_ON can be modified in lwipopts.h file for the p
 #define DHCP_DEBUG                      LWIP_DBG_ON
 #define AUTOIP_DEBUG                    LWIP_DBG_OFF
 #define SNMP_MSG_DEBUG                  LWIP_DBG_OFF
-#define SNMP_MIB_DEBUG                  LWIP_DBG_OFF
+#define SNMP_MIB_DEBUG                  LWIP_DBG_ON
 #define DNS_DEBUG                       LWIP_DBG_OFF
 
 
