@@ -112,6 +112,7 @@ void ErrorHook(void)
 
 TASK(InitTask)
 {
+   ciaaPOSIX_printf("ciaak_start()\n");
    /* init CIAA kernel and devices */
    ciaak_start();
 
@@ -129,18 +130,22 @@ TASK(InitTask)
 
    dbg_load_uart(&fd_usb_uart);
 
-   char message[] = "Hi! :)\nWaiting for characters at port 7\n";
+   char message[] = "Hi! :)\nWaiting for characters at port";
    // ciaaPOSIX_write(fd_usb_uart, message, ciaaPOSIX_strlen(message));
    // MTS_PLATFORM_DIAG(( message ));
    // dbg_send(message, ciaaPOSIX_strlen(message));
-   MTS_PLATFORM_DIAG(("%s %d\n", message, 5));
+   MTS_PLATFORM_DIAG(("%s %d\n", message, 7));
 
+   ciaaPOSIX_printf("echo_init()\n");
    /* start TCP echo example */
    echo_init();
 
+
+   ciaaPOSIX_printf("SetRelAlarm(ActivateBlinkTask, 250, 250);\n");
    /* set blinky task */
    SetRelAlarm(ActivateBlinkTask, 250, 250);
 
+   ciaaPOSIX_printf("ActivateTask(PeriodicTask);\n");
    /* activate lwip loop as a background loop */
    ActivateTask(PeriodicTask);
 

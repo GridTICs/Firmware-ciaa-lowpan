@@ -52,6 +52,8 @@
 #include "ciaaPOSIX_stddef.h"
 #include "ciaaPOSIX_ioctl_serial.h"
 #include "ciaaPOSIX_ioctl_block.h"
+#include "dbg_lwip.h"
+
 
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus
@@ -244,6 +246,7 @@ extern ssize_t ciaaPOSIX_write(int32_t fildes, void const * buf, size_t nbyte);
  **/
 extern off_t ciaaPOSIX_lseek(int32_t fildes, off_t offset, uint8_t whence);
 
+#ifndef  ciaaPOSIX_printf
 /** \brief print formated output
  **
  ** In Windows and posix this interface calls the system printf, in the CIAA HW
@@ -255,6 +258,7 @@ extern off_t ciaaPOSIX_lseek(int32_t fildes, off_t offset, uint8_t whence);
  **         representing the count of transmitted bytes if success.
  **/
 extern int32_t ciaaPOSIX_printf(const char * format, ...);
+#endif  /* ciaaPOSIX_printf */
 
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus

@@ -20,4 +20,7 @@ void dbg_printf(char *fmt, ...);
 
 #define MTS_PLATFORM_DIAG(x)   dbg_printf x ;
 
+#define ciaaPOSIX_printf  dbg_printf
+
+
 #endif

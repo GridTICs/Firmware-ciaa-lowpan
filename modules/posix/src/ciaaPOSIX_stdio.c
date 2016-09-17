@@ -307,11 +307,12 @@ extern off_t ciaaPOSIX_lseek(int32_t fildes, off_t offset, uint8_t whence)
    return ret;
 }
 
+
+
+#if (ARCH == x86)
 extern int32_t ciaaPOSIX_printf(const char * format, ...)
 {
    int32_t ret;
-
-#if (ARCH == x86)
    /* call vprintf passing all received parameters */
    va_list args;
    va_start(args, format);
@@ -320,16 +321,24 @@ extern int32_t ciaaPOSIX_printf(const char * format, ...)
    /* Fixes a Bug in Eclipse (173732) print to the console */
    /* See issue CIAA Firmware issue #35: https://github.com/ciaa/Firmware/issues/35 */
    fflush(stdout);
+
+   return ret;
+}
 #else
+#ifndef  ciaaPOSIX_printf
+extern int32_t ciaaPOSIX_printf(const char * format, ...)
+{
+   int32_t ret;
    /* parameter format is not used in no win nor posix arch, casted to void to
     * avoid compiler warning */
    (void)format;
    /* this interface is not supported in no windows nor posix system */
    ret = -1;
-#endif
 
    return ret;
 }
+#endif /* ciaaPOSIX_printf */
+#endif
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
