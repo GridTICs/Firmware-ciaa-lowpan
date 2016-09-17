@@ -54,7 +54,7 @@
 /* pbuf buffers in pool. In zero-copy mode, these buffers are
    located in peripheral RAM. In copied mode, they are located in
    internal IRAM */
-#define PBUF_POOL_SIZE                  7
+#define PBUF_POOL_SIZE                  20
 
 /* No padding needed */
 #define ETH_PAD_SIZE                    0
@@ -78,7 +78,7 @@
 #define LWIP_PLATFORM_BYTESWAP          0
 
 /* Non-static memory, used with DMA pool */
-#define MEM_SIZE                        (12 * 1024)
+#define MEM_SIZE                        (16 * 1024)
 
 /* Raw interface not needed */
 #define LWIP_RAW                        1
@@ -119,7 +119,8 @@
  * debug messages of certain types.
  */
 // #define LWIP_DBG_TYPES_ON               LWIP_DBG_ON
-#define LWIP_DBG_TYPES_ON               (( LWIP_DBG_ON | LWIP_DBG_TRACE | LWIP_DBG_STATE | LWIP_DBG_FRESH ))
+// #define LWIP_DBG_TYPES_ON               (( LWIP_DBG_ON | LWIP_DBG_TRACE | LWIP_DBG_STATE | LWIP_DBG_FRESH ))
+#define LWIP_DBG_TYPES_ON              0 
 
 /*
 Symbolic constant LWIP_DBG_TYPES_ON can be modified in lwipopts.h file for the purposes to enable or disable some kind of messages. There is 4 values that can be ORed and assigned to LWIP_DBG_TYPES_ON:*/
@@ -144,22 +145,22 @@ Symbolic constant LWIP_DBG_TYPES_ON can be modified in lwipopts.h file for the p
 #define ETHARP_DEBUG                    LWIP_DBG_ON
 #define NETIF_DEBUG                     LWIP_DBG_ON
 #define PBUF_DEBUG                      LWIP_DBG_ON
-#define API_LIB_DEBUG                   LWIP_DBG_ON
-#define API_MSG_DEBUG                   LWIP_DBG_ON
-#define SOCKETS_DEBUG                   LWIP_DBG_ON
+#define API_LIB_DEBUG                   LWIP_DBG_OFF
+#define API_MSG_DEBUG                   LWIP_DBG_OFF
+#define SOCKETS_DEBUG                   LWIP_DBG_OFF
 #define ICMP_DEBUG                      LWIP_DBG_OFF
 #define IGMP_DEBUG                      LWIP_DBG_OFF
 #define INET_DEBUG                      LWIP_DBG_ON
 /**
  * IP_REASS_DEBUG: Enable debugging in ip_frag.c for both frag & reass.
  */
-#define IP_REASS_DEBUG                  LWIP_DBG_ON
-#define IP_DEBUG                        LWIP_DBG_ON
-#define RAW_DEBUG                       LWIP_DBG_ON
+#define IP_REASS_DEBUG                  LWIP_DBG_OFF
+#define IP_DEBUG                        LWIP_DBG_OFF
+#define RAW_DEBUG                       LWIP_DBG_OFF
 #define MEM_DEBUG                       LWIP_DBG_ON
 #define MEMP_DEBUG                      LWIP_DBG_ON
-#define SYS_DEBUG                       LWIP_DBG_ON
-#define TIMERS_DEBUG                    LWIP_DBG_ON
+#define SYS_DEBUG                       LWIP_DBG_OFF
+#define TIMERS_DEBUG                    LWIP_DBG_OFF
 #define TCP_DEBUG                       LWIP_DBG_OFF
 #define TCP_INPUT_DEBUG                 LWIP_DBG_OFF
 #define TCP_FR_DEBUG                    LWIP_DBG_OFF
@@ -169,12 +170,12 @@ Symbolic constant LWIP_DBG_TYPES_ON can be modified in lwipopts.h file for the p
 #define TCP_OUTPUT_DEBUG                LWIP_DBG_OFF
 #define TCP_RST_DEBUG                   LWIP_DBG_OFF
 #define TCP_QLEN_DEBUG                  LWIP_DBG_OFF
-#define UDP_DEBUG                       LWIP_DBG_ON
-#define TCPIP_DEBUG                     LWIP_DBG_ON
-#define DHCP_DEBUG                      LWIP_DBG_ON
+#define UDP_DEBUG                       LWIP_DBG_OFF
+#define TCPIP_DEBUG                     LWIP_DBG_OFF
+#define DHCP_DEBUG                      LWIP_DBG_OFF
 #define AUTOIP_DEBUG                    LWIP_DBG_OFF
 #define SNMP_MSG_DEBUG                  LWIP_DBG_OFF
-#define SNMP_MIB_DEBUG                  LWIP_DBG_ON
+#define SNMP_MIB_DEBUG                  LWIP_DBG_OFF
 #define DNS_DEBUG                       LWIP_DBG_OFF
 
 
