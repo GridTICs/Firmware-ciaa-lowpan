@@ -14,7 +14,7 @@ void dbg_load_uart(int32_t *uart);
 int dbg_send(void *data, int datalen);
 
 /* printf in the loaded UART */
-void dbg_printf(char *fmt, ...);
+void dbg_printf(const char * const fmt, ...);
 
 #define dbgPrint(x)	dbg_send((void*)(x), ciaaPOSIX_strlen(x))
 

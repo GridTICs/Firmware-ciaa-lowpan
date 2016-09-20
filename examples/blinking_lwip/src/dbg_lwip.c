@@ -50,7 +50,7 @@ int dbg_send(void *data, int datalen)
 }
 
 
-void dbg_printf(char *fmt, ...)
+void dbg_printf(const char * const fmt, ...)
 {
 #define DBG_PRINTF_BYTELIMIT	196
    char buf[DBG_PRINTF_BYTELIMIT];
