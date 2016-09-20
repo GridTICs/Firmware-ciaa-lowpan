@@ -130,11 +130,14 @@ TASK(InitTask)
 
    dbg_load_uart(&fd_usb_uart);
 
-   char message[] = "Hi! :)\nWaiting for characters at port";
+   char message[] = "Waiting for characters at port";
    // ciaaPOSIX_write(fd_usb_uart, message, ciaaPOSIX_strlen(message));
    // MTS_PLATFORM_DIAG(( message ));
    // dbg_send(message, ciaaPOSIX_strlen(message));
-   MTS_PLATFORM_DIAG(("%s %d\n", message, 7));
+   MTS_PLATFORM_DIAG(("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d\n",
+      LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR, LWIP_VERSION_REVISION,
+      LWIP_VERSION_RC, LWIP_DHCP,
+      message, 7));
 
    ciaaPOSIX_printf("echo_init()\n");
    /* start TCP echo example */
