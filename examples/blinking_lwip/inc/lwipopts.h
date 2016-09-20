@@ -54,7 +54,7 @@
 /* pbuf buffers in pool. In zero-copy mode, these buffers are
    located in peripheral RAM. In copied mode, they are located in
    internal IRAM */
-#define PBUF_POOL_SIZE                  20
+#define PBUF_POOL_SIZE                  7
 
 /* No padding needed */
 #define ETH_PAD_SIZE                    0
@@ -78,13 +78,13 @@
 #define LWIP_PLATFORM_BYTESWAP          0
 
 /* Non-static memory, used with DMA pool */
-#define MEM_SIZE                        (16 * 1024)
+#define MEM_SIZE                        (12 * 1024)
 
 /* Raw interface not needed */
 #define LWIP_RAW                        1
 
 /* DHCP is ok, UDP is required with DHCP */
-#define LWIP_DHCP                       0
+#define LWIP_DHCP                       1
 #define LWIP_UDP                        1
 
 /* Hostname can be used */
@@ -120,7 +120,7 @@
  */
 // #define LWIP_DBG_TYPES_ON               LWIP_DBG_ON
 // #define LWIP_DBG_TYPES_ON               (( LWIP_DBG_ON | LWIP_DBG_TRACE | LWIP_DBG_STATE | LWIP_DBG_FRESH ))
-#define LWIP_DBG_TYPES_ON              0 
+#define LWIP_DBG_TYPES_ON              0
 
 /*
 Symbolic constant LWIP_DBG_TYPES_ON can be modified in lwipopts.h file for the purposes to enable or disable some kind of messages. There is 4 values that can be ORed and assigned to LWIP_DBG_TYPES_ON:*/
