@@ -97,3 +97,24 @@ diff -urN lwip/externals/lwip/cortexM4/lpc43xx/lpc4337/src/arch/lpc18xx_43xx_sys
   */
  
 -#endif /* NO_SYS == 1 */
+diff -urN lwip/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/lpc_arch.h lwip-ciaa/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/lpc_arch.h
+--- lwip/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/lpc_arch.h	2014-02-06 08:00:40.000000000 -0300
++++ lwip-ciaa/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/lpc_arch.h	21:00:37.376898683 -030002438 -0300
+@@ -52,7 +52,7 @@
+  * @note	This enables the systick interrupt and sets up the systick rate. This
+  * function is only used in standalone systems.
+  */
+-void SysTick_Enable(uint32_t period);
++void lwipSysTick_Enable(uint32_t period);
+ 
+ /**
+  * @brief	Disable LWIP tick
+@@ -60,7 +60,7 @@
+  * This disables the systick interrupt. This function is only used in
+  * standalone systems.
+  */
+-void SysTick_Disable(void);
++void lwipSysTick_Disable(void);
+ 
+ /**
+  * @brief	Get the current systick time in milliSeconds
