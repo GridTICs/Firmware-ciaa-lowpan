@@ -68,6 +68,8 @@
 #include "ciaaPOSIX_string.h" /* <= string header */
 #include "ciaak.h"            /* <= ciaa kernel header */
 #include "blinking_lwip.h"    /* <= own header */
+#include "ciaaDriverEth.h"    /* <= header for ciaaDriverEth_mainFunction() */
+
 
 // test
 #include <stdio.h>
