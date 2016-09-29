@@ -30,6 +30,7 @@
  */
 
 #include "lwip/opt.h"
+#include "chip.h"
 
 /** @defgroup NET_LWIP_DEBUG LWIP debug re-direction
  * @ingroup NET_LWIP
@@ -58,9 +59,15 @@
 /* Displays an error message on assertion */
 void assert_printf(char *msg, int line, char *file)
 {
+
 	if (msg) {
 		LWIP_DEBUGF(LWIP_DBG_ON | LWIP_DBG_LEVEL_SEVERE, ("%s:%d in file %s\n", msg, line, file));
 	}
+// TODO, enmascarar en una macro desde lwipopts.h
+#if 1
+	LWIP_DEBUGF(LWIP_DBG_ON | LWIP_DBG_LEVEL_SEVERE, ("Reiniciando...\n"));
+	NVIC_SystemReset();
+#endif
 	while (1) {}
 }
 
