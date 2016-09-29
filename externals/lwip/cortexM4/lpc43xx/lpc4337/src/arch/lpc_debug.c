@@ -59,7 +59,7 @@
 void assert_printf(char *msg, int line, char *file)
 {
 	if (msg) {
-		LWIP_DEBUGF(LWIP_DBG_ON, ("%s:%d in file %s\n", msg, line, file));
+		LWIP_DEBUGF(LWIP_DBG_ON | LWIP_DBG_LEVEL_SEVERE, ("%s:%d in file %s\n", msg, line, file));
 	}
 	while (1) {}
 }

@@ -2073,15 +2073,16 @@
  * compared against this value. If it is smaller, then debugging
  * messages are written.
  */
-// #define LWIP_DBG_MIN_LEVEL              LWIP_DBG_LEVEL_ALL
+//#define LWIP_DBG_MIN_LEVEL              LWIP_DBG_LEVEL_ALL
+#define LWIP_DBG_MIN_LEVEL              LWIP_DBG_LEVEL_WARNING
 
 /**
  * LWIP_DBG_TYPES_ON: A mask that can be used to globally enable/disable
  * debug messages of certain types.
  */
-// #define LWIP_DBG_TYPES_ON               LWIP_DBG_ON
+#define LWIP_DBG_TYPES_ON               LWIP_DBG_ON
 // #define LWIP_DBG_TYPES_ON               (( LWIP_DBG_ON | LWIP_DBG_TRACE | LWIP_DBG_STATE | LWIP_DBG_FRESH ))
-#define LWIP_DBG_TYPES_ON              0
+// #define LWIP_DBG_TYPES_ON              0
 
 /**
  * ETHARP_DEBUG: Enable debugging in etharp.c.
