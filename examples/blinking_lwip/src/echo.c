@@ -45,6 +45,7 @@
 #include "lwip/debug.h"
 #include "lwip/stats.h"
 #include "lwip/tcp.h"
+#include "echo.h"
 
 #if LWIP_TCP
 
@@ -74,16 +75,17 @@ err_t echo_poll(void *arg, struct tcp_pcb *tpcb);
 err_t echo_sent(void *arg, struct tcp_pcb *tpcb, u16_t len);
 void echo_send(struct tcp_pcb *tpcb, struct echo_state *es);
 void echo_close(struct tcp_pcb *tpcb, struct echo_state *es);
+void echo_free(struct echo_state *es);
 
 void
 echo_init(void)
 {
-  echo_pcb = tcp_new();
+  echo_pcb = tcp_new_ip_type(IPADDR_TYPE_ANY);
   if (echo_pcb != NULL)
   {
     err_t err;
 
-    err = tcp_bind(echo_pcb, IP_ADDR_ANY, 7);
+    err = tcp_bind(echo_pcb, IP_ANY_TYPE, 7);
     if (err == ERR_OK)
     {
       echo_pcb = tcp_listen(echo_pcb);
@@ -108,7 +110,9 @@ echo_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
   struct echo_state *es;
 
   LWIP_UNUSED_ARG(arg);
-  LWIP_UNUSED_ARG(err);
+  if ((err != ERR_OK) || (newpcb == NULL)) {
+    return ERR_VAL;
+  }
 
   /* Unless this pcb should have NORMAL priority, set its priority now.
      When running out of pcbs, low priority pcbs can be aborted to create
@@ -127,13 +131,14 @@ echo_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
     tcp_recv(newpcb, echo_recv);
     tcp_err(newpcb, echo_error);
     tcp_poll(newpcb, echo_poll, 0);
+    tcp_sent(newpcb, echo_sent);
     ret_err = ERR_OK;
   }
   else
   {
     ret_err = ERR_MEM;
   }
-  return ret_err;  
+  return ret_err;
 }
 
 err_t
@@ -156,7 +161,6 @@ echo_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
     else
     {
       /* we're not done yet */
-      tcp_sent(tpcb, echo_sent);
       echo_send(tpcb, es);
     }
     ret_err = ERR_OK;
@@ -166,7 +170,6 @@ echo_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
     /* cleanup, for unkown reason */
     if (p != NULL)
     {
-      es->p = NULL;
       pbuf_free(p);
     }
     ret_err = err;
@@ -177,8 +180,6 @@ echo_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
     es->state = ES_RECEIVED;
     /* store reference to incoming pbuf (chain) */
     es->p = p;
-    /* install send completion notifier */
-    tcp_sent(tpcb, echo_sent);
     echo_send(tpcb, es);
     ret_err = ERR_OK;
   }
@@ -188,7 +189,6 @@ echo_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
     if(es->p == NULL)
     {
       es->p = p;
-      tcp_sent(tpcb, echo_sent);
       echo_send(tpcb, es);
     }
     else
@@ -197,23 +197,14 @@ echo_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
 
       /* chain pbufs to the end of what we recv'ed previously  */
       ptr = es->p;
-      pbuf_chain(ptr,p);
+      pbuf_cat(ptr,p);
     }
-    ret_err = ERR_OK;
-  }
-  else if(es->state == ES_CLOSING)
-  {
-    /* odd case, remote side closing twice, trash data */
-    tcp_recved(tpcb, p->tot_len);
-    es->p = NULL;
-    pbuf_free(p);
     ret_err = ERR_OK;
   }
   else
   {
     /* unkown es->state, trash data  */
     tcp_recved(tpcb, p->tot_len);
-    es->p = NULL;
     pbuf_free(p);
     ret_err = ERR_OK;
   }
@@ -228,10 +219,8 @@ echo_error(void *arg, err_t err)
   LWIP_UNUSED_ARG(err);
 
   es = (struct echo_state *)arg;
-  if (es != NULL)
-  {
-    mem_free(es);
-  }
+
+  echo_free(es);
 }
 
 err_t
@@ -246,7 +235,6 @@ echo_poll(void *arg, struct tcp_pcb *tpcb)
     if (es->p != NULL)
     {
       /* there is a remaining pbuf (chain)  */
-      tcp_sent(tpcb, echo_sent);
       echo_send(tpcb, es);
     }
     else
@@ -312,7 +300,6 @@ echo_send(struct tcp_pcb *tpcb, struct echo_state *es)
   if (wr_err == ERR_OK)
   {
      u16_t plen;
-      u8_t freed;
 
      plen = ptr->len;
      /* continue with next pbuf in chain (if any) */
@@ -323,12 +310,7 @@ echo_send(struct tcp_pcb *tpcb, struct echo_state *es)
        pbuf_ref(es->p);
      }
      /* chop first pbuf from chain */
-      do
-      {
-        /* try hard to free pbuf */
-        freed = pbuf_free(ptr);
-      }
-      while(freed == 0);
+     pbuf_free(ptr);
      /* we can read more data now */
      tcp_recved(tpcb, plen);
    }
@@ -352,12 +334,24 @@ echo_close(struct tcp_pcb *tpcb, struct echo_state *es)
   tcp_recv(tpcb, NULL);
   tcp_err(tpcb, NULL);
   tcp_poll(tpcb, NULL, 0);
-  
+
+  echo_free(es);
+
+  tcp_close(tpcb);
+}
+
+void echo_free(struct echo_state *es)
+{
   if (es != NULL)
   {
+    if (es->p)
+    {
+      /* free the buffer chain if present */
+      pbuf_free(es->p);
+    }
+
     mem_free(es);
   }  
-  tcp_close(tpcb);
 }
 
 #endif /* LWIP_TCP */
