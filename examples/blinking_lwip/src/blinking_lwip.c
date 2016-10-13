@@ -63,6 +63,7 @@
  */
 
 /*==================[inclusions]=============================================*/
+#include "chip.h"             /* <= header for NVIC_SystemReset */
 #include "os.h"               /* <= operating system header */
 #include "ciaaPOSIX_stdio.h"  /* <= device handler header */
 #include "ciaaPOSIX_string.h" /* <= string header */
@@ -110,6 +111,10 @@ void ErrorHook(void)
 {
    ciaaPOSIX_printf("ErrorHook was called\n");
    ciaaPOSIX_printf("Service: %d, P1: %d, P2: %d, P3: %d, RET: %d\n", OSErrorGetServiceId(), OSErrorGetParam1(), OSErrorGetParam2(), OSErrorGetParam3(), OSErrorGetRet());
+
+   ciaaPOSIX_printf("SystemReset...\n");
+   NVIC_SystemReset();
+
    ShutdownOS(0);
 }
 
