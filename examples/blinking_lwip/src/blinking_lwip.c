@@ -79,6 +79,7 @@
 
 /*==================[internal data declaration]==============================*/
 int fd_out;
+unsigned int print_counter;
 
 /*==================[internal functions declaration]=========================*/
 
@@ -136,14 +137,10 @@ TASK(InitTask)
    // ciaaPOSIX_write(fd_usb_uart, message, ciaaPOSIX_strlen(message));
    // MTS_PLATFORM_DIAG(( message ));
    // dbg_send(message, ciaaPOSIX_strlen(message));
-   MTS_PLATFORM_DIAG(("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d\n",
+   MTS_PLATFORM_DIAG(("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d - usando memoria estatica\n",
       LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR, LWIP_VERSION_REVISION,
       LWIP_VERSION_RC, LWIP_DHCP,
       message, 7));
-
-   ciaaPOSIX_printf("echo_init()\n");
-   /* start TCP echo example */
-   echo_init();
 
 
    ciaaPOSIX_printf("SetRelAlarm(ActivateBlinkTask, 250, 250);\n");
@@ -167,6 +164,7 @@ TASK(BlinkTask)
 
    /* blink */
    outputs ^= 0x10;
+   print_counter++;
 
    /* write */
    ciaaPOSIX_write(fd_out, &outputs, 1);
@@ -178,8 +176,28 @@ TASK(BlinkTask)
 /* this task runs with the minimum priority */
 TASK(PeriodicTask)
 {
+// #define DOTDEBUG
+#ifdef DOTDEBUG
+   int print_divider = 0;
+#endif
+
+   ciaaPOSIX_printf("echo_init()\n");
+   /* start TCP echo example */
+   echo_init();
+
    while(1)
    {
+#ifdef DOTDEBUG
+      if (print_counter&1)
+      {
+          ciaaPOSIX_printf(".");
+          if (print_divider++ >= 10)
+          {
+             ciaaPOSIX_printf("\n");
+             print_divider = 0;
+          }
+      }
+#endif /* DOTDEBUG */
       /* lwip stack periodic loop */
       ciaaDriverEth_mainFunction();
    }

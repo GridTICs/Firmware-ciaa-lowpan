@@ -204,7 +204,13 @@
  * instead of the lwip internal allocator. Can save code size if you
  * already use it.
  */
+// #define OSEKMEM
+
+#ifdef OSEKMEM
 #define MEM_LIBC_MALLOC                 1
+#else
+#define MEM_LIBC_MALLOC                 0
+#endif
 
 /**
  * MEMP_MEM_MALLOC==1: Use mem_malloc/mem_free instead of the lwip pool allocator.
@@ -215,8 +221,11 @@
  * ATTENTION: Currently, this uses the heap for ALL pools (also for private pools,
  * not only for internal pools defined in memp_std.h)!
  */
+#ifdef OSEKMEM
 #define MEMP_MEM_MALLOC                 1
-
+#else
+#define MEMP_MEM_MALLOC                 0
+#endif
 /**
  * MEM_ALIGNMENT: should be set to the alignment of the CPU
  *    4 byte alignment -> \#define MEM_ALIGNMENT 4
@@ -224,7 +233,17 @@
  */
 /* TODO cortexm4 tiene alineamiento por byte, pero el resto?
  * distinguir cuales  */
-#if 1
+
+/* alineamiento de 8 bits o de 32 */
+#ifdef OSEKMEM
+// Acá se se fuerza el alineamiento
+// porque aparentemente el de OSEK no funciona bien.
+// #define	ALIGN_32BIT
+#else
+#define ALIGN_32BIT
+#endif
+
+#ifndef ALIGN_32BIT
 /* 8-bit alignment */
 #define MEM_ALIGNMENT                   1
 #else
@@ -237,7 +256,7 @@
  * a lot of data that needs to be copied, this should be set high.
  */
 /* Non-static memory, used with DMA pool */
-#define MEM_SIZE                        (12 * 1024)
+#define MEM_SIZE                        (8 * 1024)
 
 /**
  * MEMP_OVERFLOW_CHECK: memp overflow protection reserves a configurable
@@ -2087,12 +2106,12 @@
 /**
  * ETHARP_DEBUG: Enable debugging in etharp.c.
  */
-#define ETHARP_DEBUG                    LWIP_DBG_ON
+#define ETHARP_DEBUG                    LWIP_DBG_OFF
 
 /**
  * NETIF_DEBUG: Enable debugging in netif.c.
  */
-#define NETIF_DEBUG                     LWIP_DBG_ON
+#define NETIF_DEBUG                     LWIP_DBG_OFF
 
 /**
  * PBUF_DEBUG: Enable debugging in pbuf.c.
@@ -2127,7 +2146,7 @@
 /**
  * INET_DEBUG: Enable debugging in inet.c.
  */
-#define INET_DEBUG                      LWIP_DBG_ON
+#define INET_DEBUG                      LWIP_DBG_OFF
 
 /**
  * IP_DEBUG: Enable debugging for IP.
@@ -2147,12 +2166,12 @@
 /**
  * MEM_DEBUG: Enable debugging in mem.c.
  */
-#define MEM_DEBUG                       LWIP_DBG_ON
+#define MEM_DEBUG                       LWIP_DBG_OFF
 
 /**
  * MEMP_DEBUG: Enable debugging in memp.c.
  */
-#define MEMP_DEBUG                      LWIP_DBG_ON
+#define MEMP_DEBUG                      LWIP_DBG_OFF
 
 /**
  * SYS_DEBUG: Enable debugging in sys.c.
@@ -2228,7 +2247,7 @@
 /**
  * DHCP_DEBUG: Enable debugging in dhcp.c.
  */
-#define DHCP_DEBUG                      LWIP_DBG_OFF
+#define DHCP_DEBUG                      LWIP_DBG_ON
 
 /**
  * AUTOIP_DEBUG: Enable debugging in autoip.c.
@@ -2283,8 +2302,17 @@
 */
 /* FIXME replace with mem_malloc macros and his family acording to docs */
 /* Needed for malloc/free */
-#include "ciaaPOSIX_stdlib.h"
+/* #include "ciaaPOSIX_stdlib.h"
 #define malloc ciaaPOSIX_malloc
-#define free ciaaPOSIX_free
+#define free ciaaPOSIX_free */
 
+#ifdef OSEKMEM
+// http://lwip.wikia.com/wiki/Porting_For_Bare_Metal
+// #define mem_init()
+#include "ciaaPOSIX_stdlib.h"
+#define free                    ciaaPOSIX_free
+#define malloc                  ciaaPOSIX_malloc
+// #define mem_calloc(c, n)            mch_zalloc((c) * (n))
+// #define mem_realloc(p, sz)          (p)
+#endif
 #endif /* __LWIPOPTS_H_ */

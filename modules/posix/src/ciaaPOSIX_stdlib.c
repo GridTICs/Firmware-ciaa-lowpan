@@ -78,6 +78,7 @@ typedef struct ciaaPOSIX_chunk_header ciaaPOSIX_chunk_header;
 ciaaPOSIX_chunk_header *first_chunk_header;
 
 /** \brief ciaa memory buffer */
+__attribute__ ((section(".bss.$RamLoc40")))
 static char ciaaPOSIX_buffer[CIAA_HEAP_MEM_SIZE];
 
 /** \brief ciaa POSIX sempahore */
@@ -92,7 +93,8 @@ static void ciaaPOSIX_chunk_partition(ciaaPOSIX_chunk_header *chunk_header, uint
    // if there is at least one byte after the partition
    if (chunk_header->size > size + sizeof(ciaaPOSIX_chunk_header)) {
       ciaaPOSIX_chunk_header *next_chunk_header = (ciaaPOSIX_chunk_header *)(((char *)chunk_header) + size + sizeof(ciaaPOSIX_chunk_header));
-#if (cortexM0 == ARCH)
+// #define FORCE32_BIT_ALIGN
+#if (cortexM0 == ARCH) || defined FORCE32_BIT_ALIGN
        /* Cortex-M0 doesn't support unaligned memory access */
        /* Align chunk to 32-bits address */
        next_chunk_header = (ciaaPOSIX_chunk_header *)(((int)next_chunk_header+3) & ~3);
