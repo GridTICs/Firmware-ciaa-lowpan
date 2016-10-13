@@ -142,7 +142,7 @@ TASK(InitTask)
    // ciaaPOSIX_write(fd_usb_uart, message, ciaaPOSIX_strlen(message));
    // MTS_PLATFORM_DIAG(( message ));
    // dbg_send(message, ciaaPOSIX_strlen(message));
-   MTS_PLATFORM_DIAG(("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d - usando memoria estatica\n",
+   MTS_PLATFORM_DIAG(("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d - usando memoria de OSEK\n",
       LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR, LWIP_VERSION_REVISION,
       LWIP_VERSION_RC, LWIP_DHCP,
       message, 7));

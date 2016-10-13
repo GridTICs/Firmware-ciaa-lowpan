@@ -93,7 +93,7 @@ static void ciaaPOSIX_chunk_partition(ciaaPOSIX_chunk_header *chunk_header, uint
    // if there is at least one byte after the partition
    if (chunk_header->size > size + sizeof(ciaaPOSIX_chunk_header)) {
       ciaaPOSIX_chunk_header *next_chunk_header = (ciaaPOSIX_chunk_header *)(((char *)chunk_header) + size + sizeof(ciaaPOSIX_chunk_header));
-// #define FORCE32_BIT_ALIGN
+#define FORCE32_BIT_ALIGN
 #if (cortexM0 == ARCH) || defined FORCE32_BIT_ALIGN
        /* Cortex-M0 doesn't support unaligned memory access */
        /* Align chunk to 32-bits address */
