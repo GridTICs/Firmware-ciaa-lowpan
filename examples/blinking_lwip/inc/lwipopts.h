@@ -204,7 +204,7 @@
  * instead of the lwip internal allocator. Can save code size if you
  * already use it.
  */
-#define OSEKMEM
+// #define OSEKMEM
 
 #ifdef OSEKMEM
 #define MEM_LIBC_MALLOC                 1
@@ -238,7 +238,7 @@
 #ifdef OSEKMEM
 // Acá se se fuerza el alineamiento
 // porque aparentemente el de OSEK no funciona bien.
-#define	ALIGN_32BIT
+// #define	ALIGN_32BIT
 #else
 #define ALIGN_32BIT
 #endif
