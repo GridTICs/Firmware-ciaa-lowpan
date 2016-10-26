@@ -45,7 +45,7 @@ ext_lwip_SRC_PATH   = $(ext_lwip_PATH)$(DS)lwip_src$(DS)src
 ext_lwip_INC_PATH   = $(ext_lwip_PATH)$(DS)lwip_src$(DS)src$(DS)include \
 	$(ext_lwip_PATH)$(DS)lwip_src$(DS)src$(DS)include$(DS)ipv4
 # IPv6 Not yet tested, not implemented
-# ext_lwip_INC_PATH  += $(ext_lwip_PATH)$(DS)lwip_src$(DS)src$(DS)include$(DS)ipv6
+ext_lwip_INC_PATH  += $(ext_lwip_PATH)$(DS)lwip_src$(DS)src$(DS)include$(DS)ipv6
 # arch's Drivers
 ext_lwip_INC_PATH   += $(ext_lwip_PATH)$(DS)$(ARCH)$(DS)inc \
 	$(ext_lwip_PATH)$(DS)$(ARCH)$(DS)$(CPUTYPE)$(DS)inc \
@@ -60,7 +60,7 @@ ext_lwip_SRC_FILES += $(wildcard $(ext_lwip_SRC_PATH)$(DS)*.c)	\
    $(wildcard $(ext_lwip_SRC_PATH)$(DS)core$(DS)snmp$(DS)*.c)   \
    $(wildcard $(ext_lwip_SRC_PATH)$(DS)netif$(DS)*.c)
 # IPv6 Not yet tested, not implemented
-# ext_lwip_SRC_FILES += $(wildcard $(ext_lwip_SRC_PATH)$(DS)core$(DS)ipv6$(DS)*.c)
+ext_lwip_SRC_FILES += $(wildcard $(ext_lwip_SRC_PATH)$(DS)core$(DS)ipv6$(DS)*.c)
 # LWIP'  NON TESTED code
 # ext_lwip_SRC_FILES += $(wildcard $(ext_lwip_SRC_PATH)$(DS)netif$(DS)ppp$(DS)*.c)
 # arch's drivers

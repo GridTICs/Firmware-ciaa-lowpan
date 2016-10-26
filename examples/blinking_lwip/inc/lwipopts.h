@@ -256,7 +256,7 @@
  * a lot of data that needs to be copied, this should be set high.
  */
 /* Non-static memory, used with DMA pool */
-#define MEM_SIZE                        (8 * 1024)
+#define MEM_SIZE                        (6 * 1024)
 
 /**
  * MEMP_OVERFLOW_CHECK: memp overflow protection reserves a configurable
@@ -744,7 +744,7 @@
 /**
  * LWIP_DHCP==1: Enable DHCP module.
  */
-#define LWIP_DHCP                       1
+#define LWIP_DHCP                       0
 
 #if !LWIP_IPV4
 /* disable DHCP when IPv4 is disabled */
@@ -1636,11 +1636,13 @@
  * IP6_STATS==1: Enable IPv6 stats.
  */
 // #define IP6_STATS                       (LWIP_IPV6)
+#define IP6_STATS                       0
 
 /**
  * ICMP6_STATS==1: Enable ICMP for IPv6 stats.
  */
 // #define ICMP6_STATS                     (LWIP_IPV6 && LWIP_ICMP6)
+#define ICMP6_STATS                     0
 
 /**
  * IP6_FRAG_STATS==1: Enable IPv6 fragmentation stats.
@@ -1651,11 +1653,14 @@
  * MLD6_STATS==1: Enable MLD for IPv6 stats.
  */
 // #define MLD6_STATS                      (LWIP_IPV6 && LWIP_IPV6_MLD)
+#define MLD6_STATS                      0
+
 
 /**
  * ND6_STATS==1: Enable Neighbor discovery for IPv6 stats.
  */
 // #define ND6_STATS                       (LWIP_IPV6)
+#define ND6_STATS                       0
 
 /**
  * MIB2_STATS==1: Stats for SNMP MIB2.
@@ -1784,7 +1789,7 @@
 /**
  * LWIP_IPV6==1: Enable IPv6
  */
-// #define LWIP_IPV6                       0
+#define LWIP_IPV6                       1
 
 /**
  * LWIP_IPV6_NUM_ADDRESSES: Number of IPv6 addresses per netif.
@@ -1857,7 +1862,7 @@
 /**
  * LWIP_IPV6_MLD==1: Enable multicast listener discovery protocol.
  */
-// #define LWIP_IPV6_MLD                   (LWIP_IPV6)
+#define LWIP_IPV6_MLD                   0
 
 /**
  * MEMP_NUM_MLD6_GROUP: Max number of IPv6 multicast that can be joined.
@@ -2146,7 +2151,7 @@
 /**
  * INET_DEBUG: Enable debugging in inet.c.
  */
-#define INET_DEBUG                      LWIP_DBG_OFF
+#define INET_DEBUG                      LWIP_DBG_ON
 
 /**
  * IP_DEBUG: Enable debugging for IP.
@@ -2252,7 +2257,7 @@
 /**
  * AUTOIP_DEBUG: Enable debugging in autoip.c.
  */
-#define AUTOIP_DEBUG                    LWIP_DBG_OFF
+#define AUTOIP_DEBUG                    LWIP_DBG_ON
 
 /**
  * DNS_DEBUG: Enable debugging for DNS.
@@ -2262,7 +2267,7 @@
 /**
  * IP6_DEBUG: Enable debugging for IPv6.
  */
-#define IP6_DEBUG                       LWIP_DBG_OFF
+#define IP6_DEBUG                       LWIP_DBG_ON
 /**
  * @}
  */

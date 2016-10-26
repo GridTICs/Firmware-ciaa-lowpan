@@ -124,4 +124,8 @@ void assert_loop(void);
  * @}
  */
 
+#warning "CUIDADO verificar que rand() esté definida"
+#define LWIP_RAND() ((u32_t)rand())
+
+
 #endif /* __CC_H__ */ 

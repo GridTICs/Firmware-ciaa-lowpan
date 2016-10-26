@@ -77,6 +77,7 @@
 #else /* LWIP_VERSION_MAJOR == 1U */
 #include "lwip/timeouts.h"
 #endif /* LWIP_VERSION_MAJOR == 1U */
+
 /*==================[macros and definitions]=================================*/
 
 /*==================[internal data declaration]==============================*/
@@ -123,7 +124,7 @@ static void prvSetupHardware(void)
 
 void ciaaDriverEth_init(void)
 {
-    static ip_addr_t ipaddr, netmask, gw;
+    static ip4_addr_t  ipaddr, netmask, gw;
 
    /* init Ethernet Hardware */
    prvSetupHardware();
@@ -137,8 +138,8 @@ void ciaaDriverEth_init(void)
    IP4_ADDR(&ipaddr, 0, 0, 0, 0);
    IP4_ADDR(&netmask, 0, 0, 0, 0);
 #else
-   IP4_ADDR(&gw, 10, 0, 0, 1);
-   IP4_ADDR(&ipaddr, 10, 0, 0, 123);
+   IP4_ADDR(&gw, 192,168,23,1);
+   IP4_ADDR(&ipaddr, 192,168,23,143);
    IP4_ADDR(&netmask, 255, 255, 255, 0);
 #endif
 
@@ -169,6 +170,9 @@ netif_add(
    /* Add netif interface for lpc17xx_8x */
    netif_add(&lpc_netif, &ipaddr, &netmask, &gw, NULL, lpc_enetif_init,
            ethernet_input);
+
+   netif_create_ip6_linklocal_address(&lpc_netif, 0);
+
    netif_set_default(&lpc_netif);
 #if CIAA_LWIP_VERSION != CIAA_LWIP_141
 /*  This is the hardware link state; e.g. whether cable is plugged for wired
@@ -182,6 +186,22 @@ netif_add(
 
 #if LWIP_DHCP
    dhcp_start(&lpc_netif);
+#endif
+
+#if 1
+   uint8_t i;
+   ip_addr_t  my_address = {{{{0}}},0}; 
+   char tmp_buff[IP6ADDR_STRLEN_MAX];
+ 
+  // IPv6 addresses
+   for (i=0; i<LWIP_IPV6_NUM_ADDRESSES; i++) {
+       if (lpc_netif.ip6_addr_state[i] != IP6_ADDR_INVALID) {
+           my_address = lpc_netif.ip6_addr[i];
+           my_address.type = IPADDR_TYPE_V6;
+	   ipaddr_ntoa_r(&my_address, tmp_buff, sizeof(tmp_buff));
+           ciaaPOSIX_printf("IP6_ADDR[%d]: %s\r\n", i, tmp_buff);
+       }
+   }
 #endif
 }
 
