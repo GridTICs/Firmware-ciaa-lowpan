@@ -47,8 +47,12 @@
 #include "netif/ppp_oe.h"
 #else
 /* code for lwip version 2.0.0 (development) */
-#include "netif/ppp/pppoe.h"
+#include "lwip/stats.h"
 #include "lwip/snmp.h"
+#include "lwip/ethip6.h"
+#include "lwip/etharp.h"
+#include "lwip/mld6.h"
+#include "netif/ppp/pppoe.h"
 #endif /*  CIAA_LWIP_VERSION == CIAA_LWIP_141 */
 
 #include "lpc_18xx43xx_emac_config.h"
@@ -297,6 +301,9 @@ static struct pbuf *lpc_low_level_input(struct netif *netif) {
 			LINK_STATS_INC(link.err);
 			rxerr = 1;
 		}
+#if CIAA_LWIP_VERSION != CIAA_LWIP_141
+		MIB2_STATS_NETIF_INC(netif, ifindiscards);
+#endif /* CIAA_LWIP_VERSION != CIAA_LWIP_141 */
 	}
 
 	/* Increment free descriptor count and next get index */
@@ -323,7 +330,17 @@ static struct pbuf *lpc_low_level_input(struct netif *netif) {
 		/* Get length of received packet */
 		p->len = p->tot_len = (u16_t) RDES_FLMSK(status);
 
+#if CIAA_LWIP_VERSION != CIAA_LWIP_141
+		MIB2_STATS_NETIF_ADD(netif, ifinoctets, p->tot_len);
+		if (((u8_t*)p->payload)[0] & 1) {
+			/* broadcast or multicast packet*/
+			MIB2_STATS_NETIF_INC(netif, ifinnucastpkts);
+		} else {
+			/* unicast packet*/
+			MIB2_STATS_NETIF_INC(netif, ifinucastpkts);
+		}
 		LINK_STATS_INC(link.recv);
+#endif /* CIAA_LWIP_VERSION != CIAA_LWIP_141 */
 
 		LWIP_DEBUGF(EMAC_DEBUG | LWIP_DBG_TRACE,
 					("lpc_low_level_input: Packet received, %d bytes, "
@@ -517,6 +534,17 @@ static err_t lpc_low_level_output(struct netif *netif, struct pbuf *sendp)
 	lpc_netifdata->tx_fill_idx = idx;
 
 	LINK_STATS_INC(link.xmit);
+
+#if CIAA_LWIP_VERSION != CIAA_LWIP_141
+	MIB2_STATS_NETIF_ADD(netif, ifoutoctets, p->tot_len);
+	if (((u8_t*)p->payload)[0] & 1) {
+		/* broadcast or multicast packet*/
+		MIB2_STATS_NETIF_INC(netif, ifoutnucastpkts);
+	} else {
+		/* unicast packet */
+		MIB2_STATS_NETIF_INC(netif, ifoutucastpkts);
+	}
+#endif /* CIAA_LWIP_VERSION != CIAA_LWIP_141 */
 
 	/* Give first descriptor to DMA to start transfer */
 	lpc_netifdata->ptdesc[fidx].CTRLSTAT |= TDES_OWN;
@@ -724,6 +752,9 @@ void lpc_enetif_input(struct netif *netif)
 	case ETHTYPE_PPPOEDISC:
 	case ETHTYPE_PPPOE:
 #endif /* PPPOE_SUPPORT */
+#if LWIP_IPV6
+	case ETHTYPE_IPV6:
+#endif
 		/* full packet send to tcpip_thread to process */
 		if (netif->input(p, netif) != ERR_OK) {
 			LWIP_DEBUGF(NETIF_DEBUG,
@@ -738,6 +769,7 @@ void lpc_enetif_input(struct netif *netif)
 		pbuf_free(p);
 		break;
 	}
+	p = NULL;
 }
 
 /* Call for freeing TX buffers that are complete */
@@ -910,6 +942,25 @@ err_t lpc_enetif_init(struct netif *netif)
 	netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_UP |
 				   NETIF_FLAG_ETHERNET;
 
+
+#if CIAA_LWIP_VERSION != CIAA_LWIP_141
+#if LWIP_IPV6 && LWIP_IPV6_MLD
+#warning "code for LWIP_IPV6_MLD has not been tested in this driver" 
+	/*
+	* For hardware/netifs that implement MAC filtering.
+	* All-nodes link-local is handled by default, so we must let the hardware know
+	* to allow multicast packets in.
+	* Should set mld_mac_filter previously. */
+	if (netif->mld_mac_filter != NULL) {
+		ip6_addr_t ip6_allnodes_ll;
+		ip6_addr_set_allnodes_linklocal(&ip6_allnodes_ll);
+		netif->mld_mac_filter(netif, &ip6_allnodes_ll, MLD6_ADD_MAC_FILTER);
+	}
+#endif /* LWIP_IPV6 && LWIP_IPV6_MLD */
+/* FIXME could not get link speed in bps */
+/* MIB2_INIT_NETIF(netif, snmp_ifType_ethernet_csmacd, LINK_SPEED_OF_YOUR_NETIF_IN_BPS); */
+#endif /* CIAA_LWIP_VERSION != CIAA_LWIP_141 */
+
 	/* Initialize the hardware */
 	netif->state = &lpc_enetdata;
 	err = low_level_init(netif);
@@ -926,6 +977,12 @@ err_t lpc_enetif_init(struct netif *netif)
 	netif->name[1] = 'n';
 
 	netif->output = lpc_etharp_output;
+
+#if CIAA_LWIP_VERSION != CIAA_LWIP_141
+#if LWIP_IPV6
+	netif->output_ip6 = ethip6_output;
+#endif /* LWIP_IPV6 */
+#endif /* CIAA_LWIP_VERSION != CIAA_LWIP_141 */
 	netif->linkoutput = lpc_low_level_output;
 
 	/* For FreeRTOS, start tasks */
