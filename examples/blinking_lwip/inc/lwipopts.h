@@ -256,7 +256,7 @@
  * a lot of data that needs to be copied, this should be set high.
  */
 /* Non-static memory, used with DMA pool */
-#define MEM_SIZE                        (6 * 1024)
+#define MEM_SIZE                        (12 * 512)
 
 /**
  * MEMP_OVERFLOW_CHECK: memp overflow protection reserves a configurable
@@ -744,7 +744,7 @@
 /**
  * LWIP_DHCP==1: Enable DHCP module.
  */
-#define LWIP_DHCP                       0
+#define LWIP_DHCP                       1
 
 #if !LWIP_IPV4
 /* disable DHCP when IPv4 is disabled */
