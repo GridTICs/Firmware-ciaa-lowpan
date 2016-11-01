@@ -168,10 +168,11 @@ netif_add(
 #endif
 
    /* Add netif interface for lpc17xx_8x */
-   netif_add(&lpc_netif, &ipaddr, &netmask, &gw, NULL, lpc_enetif_init,
-           ethernet_input);
+   netif_add(&lpc_netif, &ipaddr, &netmask, &gw, NULL, lpc_enetif_init, ethernet_input);
 
-   netif_create_ip6_linklocal_address(&lpc_netif, 0);
+   netif_create_ip6_linklocal_address(&lpc_netif, 1); // if != 0, assume hwadr is a 48-bit MAC address (std conversion)
+
+   netif_set_ip6_autoconfig_enabled(&lpc_netif, 1);
 
    netif_set_default(&lpc_netif);
 #if CIAA_LWIP_VERSION != CIAA_LWIP_141
