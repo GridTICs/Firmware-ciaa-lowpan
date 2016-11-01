@@ -198,7 +198,7 @@ TASK(PeriodicTask)
           ciaaPOSIX_printf(".");
           if (print_divider++ >= 10)
           {
-             ciaaPOSIX_printf("\n");
+             ciaaPOSIX_printf(" LWIP_RAND: %d\n", LWIP_RAND());
              print_divider = 0;
           }
       }
