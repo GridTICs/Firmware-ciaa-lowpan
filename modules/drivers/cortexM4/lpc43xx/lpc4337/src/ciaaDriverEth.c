@@ -170,10 +170,11 @@ netif_add(
    /* Add netif interface for lpc17xx_8x */
    netif_add(&lpc_netif, &ipaddr, &netmask, &gw, NULL, lpc_enetif_init, ethernet_input);
 
+#if LWIP_IPV6
    netif_create_ip6_linklocal_address(&lpc_netif, 1); // if != 0, assume hwadr is a 48-bit MAC address (std conversion)
 
    netif_set_ip6_autoconfig_enabled(&lpc_netif, 1);
-
+#endif
    netif_set_default(&lpc_netif);
 #if CIAA_LWIP_VERSION != CIAA_LWIP_141
 /*  This is the hardware link state; e.g. whether cable is plugged for wired
@@ -188,8 +189,14 @@ netif_add(
 #if LWIP_DHCP
    dhcp_start(&lpc_netif);
 #endif
+#if LWIP_IPV6
+   show_ipv6_addr();
+#endif
+}
 
-#if 1
+#if LWIP_IPV6
+void show_ipv6_addr(void)
+{
    uint8_t i;
    ip_addr_t  my_address = {{{{0}}},0}; 
    char tmp_buff[IP6ADDR_STRLEN_MAX];
@@ -203,8 +210,8 @@ netif_add(
            ciaaPOSIX_printf("IP6_ADDR[%d]: %s\r\n", i, tmp_buff);
        }
    }
-#endif
 }
+#endif
 
 void ciaaDriverEth_mainFunction(void)
 {

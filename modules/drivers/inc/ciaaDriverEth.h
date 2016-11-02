@@ -69,6 +69,12 @@ extern void ciaaDriverEth_init(void);
 /** \brief main function of the ethernet driver
  **/
 extern void ciaaDriverEth_mainFunction(void);
+
+/** shows currents ipv6 addresses */
+#if LWIP_IPV6
+void show_ipv6_addr(void);
+#endif
+
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus
 }

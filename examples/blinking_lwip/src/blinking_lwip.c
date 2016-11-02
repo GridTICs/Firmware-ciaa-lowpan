@@ -90,6 +90,10 @@ unsigned int print_counter;
  * Device path /dev/serial/uart/1
  */
 static int32_t fd_usb_uart;
+
+static unsigned int repeat_show = 1;
+#define LIM_SHOW_COUNTER	30
+static unsigned int show_counter = 0;
 /*==================[external data definition]===============================*/
 
 /*==================[internal functions definition]==========================*/
@@ -170,6 +174,8 @@ TASK(BlinkTask)
    /* blink */
    outputs ^= 0x10;
    print_counter++;
+   if (repeat_show)
+       show_counter++;
 
    /* write */
    ciaaPOSIX_write(fd_out, &outputs, 1);
@@ -203,6 +209,12 @@ TASK(PeriodicTask)
           }
       }
 #endif /* DOTDEBUG */
+      if (show_counter > LIM_SHOW_COUNTER && repeat_show)
+      {
+         show_ipv6_addr();
+         repeat_show--;
+         show_counter = 0;
+      }
       /* lwip stack periodic loop */
       ciaaDriverEth_mainFunction();
    }
