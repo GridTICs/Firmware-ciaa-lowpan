@@ -26,7 +26,7 @@
 #include <stdarg.h>
 
 
-int32_t *fd_uart;
+static int32_t *fd_uart;
 
 
 void dbg_load_uart(int32_t *uart)
@@ -55,10 +55,11 @@ void dbg_printf(const char * const fmt, ...)
 #define DBG_PRINTF_BYTELIMIT	196
    char buf[DBG_PRINTF_BYTELIMIT];
    va_list args;
+   size_t len;
    va_start(args, fmt);
-   vsnprintf(buf, DBG_PRINTF_BYTELIMIT, fmt, args);
+   len = vsnprintf(buf, DBG_PRINTF_BYTELIMIT, fmt, args);
 
-   dbg_send((void*)(buf), ciaaPOSIX_strlen(buf));
+   dbg_send((void*)(buf), len);
    va_end(args);
    return;
 }
