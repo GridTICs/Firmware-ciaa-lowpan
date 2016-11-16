@@ -80,6 +80,7 @@ TASK PeriodicTask {
     TYPE = EXTENDED;
     SCHEDULE = FULL;
     RESOURCE = POSIXR;
+    EVENT = POSIXE;
 }
 
 TASK BlinkTask {

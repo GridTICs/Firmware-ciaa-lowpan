@@ -150,7 +150,7 @@ const TaskConstType TasksConst[TASKS_COUNT] = {
          1, /* preemtive task */
          0
       }, /* task const flags */
-      0 , /* events mask */
+      0 | POSIXE , /* events mask */
       0 | ( 1 << POSIXR ) ,/* resources mask */
       0 /* core */
    },
