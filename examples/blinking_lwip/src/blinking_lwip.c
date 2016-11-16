@@ -149,7 +149,7 @@ TASK(InitTask)
    MTS_PLATFORM_DIAG(("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d - usando memoria estatica\n",
       LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR, LWIP_VERSION_REVISION,
       LWIP_VERSION_RC, LWIP_DHCP,
-      message, 7));
+      message, 8000));
 
 
    ciaaPOSIX_printf("SetRelAlarm(ActivateBlinkTask, 250, 250);\n");
