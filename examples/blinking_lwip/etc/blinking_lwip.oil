@@ -77,7 +77,7 @@ TASK PeriodicTask {
     PRIORITY = 1;
     ACTIVATION = 1;
     STACK = 2048;
-    TYPE = BASIC;
+    TYPE = EXTENDED;
     SCHEDULE = FULL;
     RESOURCE = POSIXR;
 }

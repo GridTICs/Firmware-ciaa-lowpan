@@ -146,7 +146,7 @@ const TaskConstType TasksConst[TASKS_COUNT] = {
        0, /* task priority */
        1, /* task max activations */
        {
-         0, /* basic task */
+         1, /* extended task */
          1, /* preemtive task */
          0
       }, /* task const flags */
