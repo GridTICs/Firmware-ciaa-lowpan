@@ -204,9 +204,11 @@
  * instead of the lwip internal allocator. Can save code size if you
  * already use it.
  */
-// #define OSEKMEM
 
-#ifdef OSEKMEM
+// Indica si se usa la memoria de posix-OSEK sino estática de lwIP
+#define OSEKMEM	0
+
+#if ( OSEKMEM == 1 )
 #define MEM_LIBC_MALLOC                 1
 #else
 #define MEM_LIBC_MALLOC                 0
@@ -221,7 +223,7 @@
  * ATTENTION: Currently, this uses the heap for ALL pools (also for private pools,
  * not only for internal pools defined in memp_std.h)!
  */
-#ifdef OSEKMEM
+#if ( OSEKMEM == 1 )
 #define MEMP_MEM_MALLOC                 1
 #else
 #define MEMP_MEM_MALLOC                 0
@@ -235,7 +237,7 @@
  * distinguir cuales  */
 
 /* alineamiento de 8 bits o de 32 */
-#ifdef OSEKMEM
+#if ( OSEKMEM == 1 )
 // Acá se se fuerza el alineamiento
 // porque aparentemente el de OSEK no funciona bien.
 // #define	ALIGN_32BIT
@@ -2311,7 +2313,7 @@
 #define malloc ciaaPOSIX_malloc
 #define free ciaaPOSIX_free */
 
-#ifdef OSEKMEM
+#if ( OSEKMEM == 1 )
 // http://lwip.wikia.com/wiki/Porting_For_Bare_Metal
 // #define mem_init()
 #include "ciaaPOSIX_stdlib.h"
