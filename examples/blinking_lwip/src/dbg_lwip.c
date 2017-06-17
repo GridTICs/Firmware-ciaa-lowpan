@@ -3,7 +3,7 @@
 // ciaaPOSIX_write
 #include "ciaaPOSIX_stdio.h"
 
-#define SENDBLOCK 1
+#define SENDBLOCK 0
 #if SENDBLOCK
 /*  TODO traer desde las bibliotcas el s'imbolo LPC_USART2 para dejar
  * consistente con dbg_load_uart */
