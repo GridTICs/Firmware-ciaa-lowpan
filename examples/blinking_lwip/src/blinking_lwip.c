@@ -182,6 +182,7 @@ TASK(InitTask)
    ciaaPOSIX_printf("ActivateTask(PeriodicTask);\n");
    /* activate lwip loop as a background loop */
    ActivateTask(PeriodicTask);
+   ActivateTask(EchoTask);
 
    TerminateTask();
 }
@@ -206,6 +207,49 @@ TASK(BlinkTask)
    /* end BlinkTask */
    TerminateTask();
 }
+
+
+/* this task runs with the minimum priority */
+TASK(EchoTask)
+{
+   int8_t buf[20];   /* buffer for uart operation              */
+   uint8_t outputs;  /* to store outputs status                */
+   int32_t ret;      /* return value variable for posix calls  */
+
+   ciaaPOSIX_printf(fd_rs232, "SerialEchoTask...\n");
+   /* send a message to the world :) */
+   char message[] = "Hi! :)\nSerialEchoTask: Waiting for characters...\n";
+   ciaaPOSIX_write(fd_rs232, message, ciaaPOSIX_strlen(message));
+
+   ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)false); // this is the default value
+   // ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)true);
+
+   while(1)
+   {
+
+      /* wait for any character ... */
+      ret = ciaaPOSIX_read(fd_rs232, buf, 20);
+
+      if(ret > 0)
+      {
+         /* also write them to the other device */
+         ciaaPOSIX_write(fd_rs232, buf, ret);
+      }
+      else
+         ciaaPOSIX_write(fd_rs232, message, 49);
+
+
+      /* blink output 5 with each loop */
+      ciaaPOSIX_read(fd_out, &outputs, 1);
+      outputs ^= 0x20;
+      ciaaPOSIX_write(fd_out, &outputs, 1);
+   }
+
+
+   /* end EchoTask */
+   TerminateTask();
+}
+
 
 /* this task runs with the minimum priority */
 TASK(PeriodicTask)
@@ -244,9 +288,11 @@ TASK(PeriodicTask)
          show_counter = 0;
       }
 
+#if 0
       /* show loop message */
       if (mostrar++ == 0)
           ciaaPOSIX_write(fd_rs232, msg, msg_size);
+#endif
 
 
       /* lwip stack periodic loop */

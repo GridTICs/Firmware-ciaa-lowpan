@@ -74,6 +74,13 @@ uint8 StackTaskPeriodicTask[2048 + TASK_STACK_ADDITIONAL_SIZE];
 __attribute__ ((section(".bss.$RamAHB32")))
 uint8 StackTaskPeriodicTask[2048];
 #endif
+/** \brief EchoTask stack */
+#if ( x86 == ARCH )
+uint8 StackTaskEchoTask[3048 + TASK_STACK_ADDITIONAL_SIZE];
+#else
+__attribute__ ((section(".bss.$RamAHB32")))
+uint8 StackTaskEchoTask[3048];
+#endif
 /** \brief BlinkTask stack */
 #if ( x86 == ARCH )
 uint8 StackTaskBlinkTask[512 + TASK_STACK_ADDITIONAL_SIZE];
@@ -86,6 +93,8 @@ uint8 StackTaskBlinkTask[512];
 TaskContextType ContextTaskInitTask;
 /** \brief PeriodicTask context */
 TaskContextType ContextTaskPeriodicTask;
+/** \brief EchoTask context */
+TaskContextType ContextTaskEchoTask;
 /** \brief BlinkTask context */
 TaskContextType ContextTaskBlinkTask;
 
@@ -93,7 +102,7 @@ TaskContextType ContextTaskBlinkTask;
 TaskType ReadyList2[1];
 
 /** \brief Ready List for Priority 1 */
-TaskType ReadyList1[1];
+TaskType ReadyList1[2];
 
 /** \brief Ready List for Priority 0 */
 TaskType ReadyList0[1];
@@ -154,6 +163,23 @@ const TaskConstType TasksConst[TASKS_COUNT] = {
       0 | ( 1 << POSIXR ) ,/* resources mask */
       0 /* core */
    },
+   /* Task EchoTask */
+   {
+       OSEK_TASK_EchoTask,   /* task entry point */
+       &ContextTaskEchoTask, /* pointer to task context */
+       StackTaskEchoTask, /* pointer stack memory */
+       sizeof(StackTaskEchoTask), /* stack size */
+       1, /* task priority */
+       1, /* task max activations */
+       {
+         1, /* extended task */
+         1, /* preemtive task */
+         0
+      }, /* task const flags */
+      0 | POSIXE , /* events mask */
+      0 | ( 1 << POSIXR ) ,/* resources mask */
+      0 /* core */
+   },
    /* Task BlinkTask */
    {
        OSEK_TASK_BlinkTask,   /* task entry point */
@@ -198,7 +224,7 @@ const ReadyConstType ReadyConst[3] = {
       ReadyList2 /* Pointer to the Ready List */
    },
    {
-      1, /* Length of this ready list */
+      2, /* Length of this ready list */
       ReadyList1 /* Pointer to the Ready List */
    },
    {
