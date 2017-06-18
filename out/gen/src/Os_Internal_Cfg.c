@@ -334,6 +334,30 @@ void OSEK_ISR2_UART2_IRQHandler(void)
 #endif /* #if (NON_PREEMPTIVE == OSEK_ENABLE) */
 }
 
+void OSEK_ISR2_UART3_IRQHandler(void)
+{
+   /* store the calling context in a variable */
+   ContextType actualContext = GetCallingContext();
+   /* set isr 2 context */
+   SetActualContext(CONTEXT_ISR2);
+
+   /* trigger isr 2 */
+   OSEK_ISR_UART3_IRQHandler();
+
+   /* reset context */
+   SetActualContext(actualContext);
+
+#if (NON_PREEMPTIVE == OSEK_DISABLE)
+   /* check if the actual task is preemptive */
+   if ( ( CONTEXT_TASK == actualContext ) &&
+        ( TasksConst[GetRunningTask()].ConstFlags.Preemtive ) )
+   {
+      /* this shall force a call to the scheduler */
+      PostIsr2_Arch(isr);
+   }
+#endif /* #if (NON_PREEMPTIVE == OSEK_ENABLE) */
+}
+
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */

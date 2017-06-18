@@ -91,6 +91,13 @@ unsigned int print_counter;
  */
 static int32_t fd_usb_uart;
 
+/** \brief File descriptor of the RS232 uart
+ *
+ * Device path /dev/serial/uart/2
+ */
+static int32_t fd_rs232;
+
+
 static unsigned int repeat_show = 1;
 #define LIM_SHOW_COUNTER	30
 static unsigned int show_counter = 0;
@@ -141,6 +148,15 @@ TASK(InitTask)
    ciaaPOSIX_ioctl(fd_usb_uart, ciaaPOSIX_IOCTL_SET_FIFO_TRIGGER_LEVEL, (void *)ciaaFIFO_TRIGGER_LEVEL3);
 
    dbg_load_uart(&fd_usb_uart);
+
+   /* open UART connected to RS232 connector */
+   fd_rs232 = ciaaPOSIX_open("/dev/serial/uart/2", ciaaPOSIX_O_RDWR);
+
+   /* change baud rate for rs232*/
+   ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_BAUDRATE, (void *)ciaaBAUDRATE_115200);
+
+   /* change FIFO TRIGGER LEVEL for rs 232 */
+   ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_FIFO_TRIGGER_LEVEL, (void *)ciaaFIFO_TRIGGER_LEVEL3);
 
    char message[] = "Waiting for characters at port";
    // ciaaPOSIX_write(fd_usb_uart, message, ciaaPOSIX_strlen(message));
@@ -194,6 +210,11 @@ TASK(BlinkTask)
 /* this task runs with the minimum priority */
 TASK(PeriodicTask)
 {
+
+   char msg[] = "hola\n";
+   uint8_t msg_size =  5;
+   uint16_t mostrar = 0;
+
 // #define DOTDEBUG
 #ifdef DOTDEBUG
    int print_divider = 0;
@@ -222,6 +243,12 @@ TASK(PeriodicTask)
          repeat_show--;
          show_counter = 0;
       }
+
+      /* show loop message */
+      if (mostrar++ == 0)
+          ciaaPOSIX_write(fd_rs232, msg, msg_size);
+
+
       /* lwip stack periodic loop */
       ciaaDriverEth_mainFunction();
    }

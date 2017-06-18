@@ -133,6 +133,14 @@ ALARM IncrementSWCounter {
    };
 };
 
+
+/* no usamos RS-485 */
+/* ISR UART0_IRQHandler { */
+/*   INTERRUPT = UART0; */
+/*   CATEGORY = 2; */
+/*    PRIORITY = 0; */
+/* }; */
+
 ISR UART2_IRQHandler {
 /* #if BOARD == ciaa_fsl */
 /*   INTERRUPT = UART5; */
@@ -142,5 +150,18 @@ ISR UART2_IRQHandler {
    CATEGORY = 2;
    PRIORITY = 0;
 };
+
+
+ISR UART3_IRQHandler {
+/* #if BOARD == ciaa_fsl */
+/*   INTERRUPT = UART2; */
+/* #else */
+   INTERRUPT = UART3;
+/* #endif */
+   CATEGORY = 2;
+   PRIORITY = 0;
+};
+
+
 
 };
