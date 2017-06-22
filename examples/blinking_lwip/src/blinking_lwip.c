@@ -209,14 +209,13 @@ TASK(BlinkTask)
 }
 
 
-/* this task runs with the minimum priority */
 TASK(EchoTask)
 {
    int8_t buf[20];   /* buffer for uart operation              */
    uint8_t outputs;  /* to store outputs status                */
    int32_t ret;      /* return value variable for posix calls  */
 
-   ciaaPOSIX_printf(fd_rs232, "SerialEchoTask...\n");
+   ciaaPOSIX_write(fd_rs232, "SerialEchoTask...\n", 18);
    /* send a message to the world :) */
    char message[] = "Hi! :)\nSerialEchoTask: Waiting for characters...\n";
    ciaaPOSIX_write(fd_rs232, message, ciaaPOSIX_strlen(message));
