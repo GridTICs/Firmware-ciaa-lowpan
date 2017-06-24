@@ -242,6 +242,8 @@ TASK(EchoTask)
       ciaaPOSIX_read(fd_out, &outputs, 1);
       outputs ^= 0x20;
       ciaaPOSIX_write(fd_out, &outputs, 1);
+
+      Schedule();
    }
 
 
@@ -296,6 +298,9 @@ TASK(PeriodicTask)
 
       /* lwip stack periodic loop */
       ciaaDriverEth_mainFunction();
+
+      Schedule();
+
    }
 }
 

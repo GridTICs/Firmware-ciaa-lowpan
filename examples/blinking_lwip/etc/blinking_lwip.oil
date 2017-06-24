@@ -78,7 +78,8 @@ TASK PeriodicTask {
     ACTIVATION = 1;
     STACK = 2048;
     TYPE = EXTENDED;
-    SCHEDULE = FULL;
+/*    SCHEDULE = FULL;   full preemptive no anda con dos UARTs */
+    SCHEDULE = NON; /* */
     RESOURCE = POSIXR;
     EVENT = POSIXE;
 }
@@ -88,7 +89,8 @@ TASK EchoTask {
     ACTIVATION = 1;
     STACK = 3048;
     TYPE = EXTENDED;
-    SCHEDULE = FULL;
+/*    SCHEDULE = FULL;   full preemptive no anda con dos UARTs */
+    SCHEDULE = NON; /*  */
     RESOURCE = POSIXR;
     EVENT = POSIXE;
 }
