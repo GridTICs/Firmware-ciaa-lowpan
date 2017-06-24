@@ -6,11 +6,13 @@
 # Crédito a Gustavo Muro: gustmuro /at/ gmail /dot/ com
 # Este parche aplica para modules/rtos en 2c7034c0bc1c3b1c609ba774bb9170b14fb050e5
 
+pushd modules/rtos
 
-
-cat <<EOF | patch -p0
---- modules/rtos/src/Schedule.c	2017-06-17 18:38:22.616978749 -0300
-+++ modules/rtos-patch/src/Schedule.c	2017-06-17 18:37:58.191247000 -0300
+cat <<EOF | git apply -
+diff --git a/src/Schedule.c b/src/Schedule.c
+index 7b01dc6..0f83346 100644
+--- a/src/Schedule.c
++++ b/src/Schedule.c
 @@ -51,6 +51,8 @@
  /*==================[inclusions]=============================================*/
  #include "Os_Internal.h"
@@ -20,7 +22,7 @@ cat <<EOF | patch -p0
  /*==================[macros and definitions]=================================*/
  
  /*==================[internal data declaration]==============================*/
-@@ -159,7 +161,9 @@
+@@ -159,7 +161,9 @@ extern StatusType Schedule
           /* set actual context task */
           SetActualContext(CONTEXT_TASK);
  
@@ -30,7 +32,7 @@ cat <<EOF | patch -p0
  
  #if (HOOK_PRETASKHOOK == OSEK_ENABLE)
           PreTaskHook();
-@@ -167,6 +171,10 @@
+@@ -167,6 +171,10 @@ extern StatusType Schedule
  
           /* jmp tp the next task */
           JmpTask(nextTask);
@@ -41,7 +43,7 @@ cat <<EOF | patch -p0
        }
        else
        {
-@@ -197,7 +205,9 @@
+@@ -197,7 +205,9 @@ extern StatusType Schedule
              /* set actual context task */
              SetActualContext(CONTEXT_TASK);
  
@@ -51,7 +53,7 @@ cat <<EOF | patch -p0
  
  #if (HOOK_PRETASKHOOK == OSEK_ENABLE)
              PreTaskHook();
-@@ -206,6 +216,10 @@
+@@ -206,6 +216,10 @@ extern StatusType Schedule
              /* \req OSEK_SYS_3.4.1.3 its context is saved */
              /* \req OSEK_SYS_3.4.1.4 and the higher-priority task is executed */
              CallTask(actualTask, nextTask);
@@ -63,3 +65,5 @@ cat <<EOF | patch -p0
           else
           {
 EOF
+
+popd
