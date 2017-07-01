@@ -2285,7 +2285,7 @@
  * Gateway IoT
  */
 
-#define GWIOT_ASSERT_RESET	1
+#define GWIOT_ASSERT_RESET	0
 
 /**
  * @}
