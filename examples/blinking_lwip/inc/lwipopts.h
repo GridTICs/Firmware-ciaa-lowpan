@@ -1984,6 +1984,14 @@
  */
 
 /**
+ * Llamado a hookear un la entrada IPv4,
+ * comentar para desactivar
+ */
+#define LWIP_USING_IP4INPUT_HOOK        1
+
+#if (( LWIP_USING_IP4INPUT_HOOK == 1 ))
+
+/**
  * LWIP_HOOK_IP4_INPUT(pbuf, input_netif):
  * - called from ip_input() (IPv4)
  * - pbuf: received struct pbuf passed to ip_input()
@@ -1994,7 +2002,10 @@
  * If the hook consumed the packet, 'pbuf' is in the responsibility of the hook
  * (i.e. free it when done).
  */
-// #define LWIP_HOOK_IP4_INPUT(pbuf, input_netif)
+#define LWIP_HOOK_IP4_INPUT(pbuf, input_netif)	gwiot_ip4_input_hook((pbuf), (netif))
+
+#endif
+
 
 /**
  * LWIP_HOOK_IP4_ROUTE(dest):
@@ -2284,6 +2295,7 @@
 /**
  * Gateway IoT
  */
+#define	LWIP_GWIOT		LWIP_DBG_ON
 
 #define GWIOT_ASSERT_RESET	0
 

@@ -76,6 +76,8 @@
 #include <stdio.h>
 #include<stdarg.h>
 
+#include "gw_iot_hooks.h"
+
 /*==================[macros and definitions]=================================*/
 
 /*==================[internal data declaration]==============================*/
@@ -265,6 +267,10 @@ TASK(PeriodicTask)
 // #define DOTDEBUG
 #ifdef DOTDEBUG
    int print_divider = 0;
+#endif
+
+#ifdef LWIP_HOOK_IP4_INPUT
+   f_load_out(&fd_out);
 #endif
 
    ciaaPOSIX_printf("echo_init()\n");
