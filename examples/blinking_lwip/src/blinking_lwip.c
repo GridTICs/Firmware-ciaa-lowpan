@@ -124,8 +124,10 @@ void ErrorHook(void)
    ciaaPOSIX_printf("Service: %d, P1: %d, P2: %d, P3: %d, RET: %d\n", OSErrorGetServiceId(), OSErrorGetParam1(), OSErrorGetParam2(), OSErrorGetParam3(), OSErrorGetRet());
 
    ciaaPOSIX_printf("SystemReset...\n");
-   NVIC_SystemReset();
 
+#if (( GWIOT_ASSERT_RESET == 1 ))
+   NVIC_SystemReset();
+#endif
    ShutdownOS(0);
 }
 

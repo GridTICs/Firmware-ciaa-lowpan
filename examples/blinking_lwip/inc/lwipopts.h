@@ -2279,6 +2279,14 @@
  *  get debug messages for the driver
  */
 #define EMAC_DEBUG                       LWIP_DBG_OFF
+
+
+/**
+ * Gateway IoT
+ */
+
+#define GWIOT_ASSERT_RESET	1
+
 /**
  * @}
  */
