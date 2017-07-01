@@ -81,10 +81,13 @@ TASK PeriodicTask {
 /*    SCHEDULE = FULL;   full preemptive no anda con dos UARTs */
     SCHEDULE = NON; /* */
     RESOURCE = POSIXR;
+    RESOURCE = RS2322IPR;
     EVENT = POSIXE;
+    EVENT = IP2RS232E;
+    EVENT = RS2322IPE;
 }
 
-TASK EchoTask {
+TASK RS232WTASK {
     PRIORITY = 2;
     ACTIVATION = 1;
     STACK = 3048;
@@ -93,6 +96,20 @@ TASK EchoTask {
     SCHEDULE = NON; /*  */
     RESOURCE = POSIXR;
     EVENT = POSIXE;
+    EVENT = IP2RS232E;
+}
+
+TASK RS232RTASK {
+    PRIORITY = 3;
+    ACTIVATION = 1;
+    STACK = 3048;
+    TYPE = EXTENDED;
+/*    SCHEDULE = FULL;   full preemptive no anda con dos UARTs */
+    SCHEDULE = NON; /*  */
+    RESOURCE = POSIXR;
+    RESOURCE = RS2322IPR;
+    EVENT = POSIXE;
+    EVENT = RS2322IPE;
 }
 
 TASK BlinkTask {
@@ -113,8 +130,11 @@ ALARM ActivateBlinkTask {
 }
 
 RESOURCE = POSIXR;
+RESOURCE = RS2322IPR;
 
 EVENT = POSIXE;
+EVENT = IP2RS232E;
+EVENT = RS2322IPE;
 
 APPMODE = AppMode1;
 

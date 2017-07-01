@@ -47,6 +47,8 @@
 #include "lwip/tcp.h"
 #include "echo.h"
 
+#include "gw_iot_hooks.h"
+
 #if LWIP_TCP
 
 static struct tcp_pcb *echo_pcb;
@@ -294,6 +296,11 @@ echo_send(struct tcp_pcb *tpcb, struct echo_state *es)
          (es->p->len <= tcp_sndbuf(tpcb)))
   {
   ptr = es->p;
+
+#ifdef LWIP_HOOK_IP4_INPUT
+  /* recojo informacion del buffer circular */
+  rs232_fetch(ptr->payload, ptr->len);
+#endif
 
   /* enqueue data for transmission */
   wr_err = tcp_write(tpcb, ptr->payload, ptr->len, 1);

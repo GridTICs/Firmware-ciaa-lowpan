@@ -71,6 +71,9 @@
 #include "blinking_lwip.h"    /* <= own header */
 #include "ciaaDriverEth.h"    /* <= header for ciaaDriverEth_mainFunction() */
 
+#include "ciaaLibs_CircBuf.h"
+
+
 
 // test
 #include <stdio.h>
@@ -98,6 +101,10 @@ static int32_t fd_usb_uart;
  * Device path /dev/serial/uart/2
  */
 static int32_t fd_rs232;
+
+#ifdef LWIP_HOOK_IP4_INPUT
+static struct tag_name in_ip;
+#endif
 
 
 static unsigned int repeat_show = 1;
@@ -186,7 +193,8 @@ TASK(InitTask)
    ciaaPOSIX_printf("ActivateTask(PeriodicTask);\n");
    /* activate lwip loop as a background loop */
    ActivateTask(PeriodicTask);
-   ActivateTask(EchoTask);
+   ActivateTask(RS232WTASK);
+   ActivateTask(RS232RTASK);
 
    TerminateTask();
 }
@@ -212,12 +220,78 @@ TASK(BlinkTask)
    TerminateTask();
 }
 
-
-TASK(EchoTask)
+TASK(RS232RTASK)
 {
+#ifdef LWIP_HOOK_IP4_INPUT
+
+   ciaaLibs_CircBufType rxBuf;
+   int32_t ret;      /* return value variable for posix calls  */
+   uint32_t tail, head, ocupados, space, rawSpace;
+   uint8_t outputs;  /* to store outputs status                */
+   bool rxBuf_new_data = 0;
+
+//   ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)false); // this is the default value
+//   ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)true);
+
+   ciaaLibs_circBufInit(&rxBuf, ciaak_malloc(256), 256);
+   // load_buf(&rxBuf, GetRunningTask());
+   rs232_load_buf(&rxBuf, RS232RTASK);
+   while(1)
+   {
+      (void)GetResource(RS2322IPR);
+      tail = rxBuf.tail;
+      head = rxBuf.head;
+      ocupados = ciaaLibs_circBufCount(&rxBuf, tail);
+      space = ciaaLibs_circBufSpace(&rxBuf, head);
+      rawSpace = ciaaLibs_circBufRawSpace(&rxBuf, head);
+      ret = 0;
+      (void)ReleaseResource(RS2322IPR);
+
+#ifdef LWIP_HOOK_IP4_INPUT
+      LWIP_DEBUGF(LWIP_GWIOT | GWIOT_NIVEL, ("Ocupados + Libres = Total: %d+%d=%d\n", ocupados, space, 255 ));
+#endif
+
+      if( space > 0 )
+      {
+         ret = ciaaPOSIX_read(fd_rs232, ciaaLibs_circBufWritePos(&rxBuf), rawSpace);
+
+         if ((ret == rawSpace) && (space > rawSpace))
+         {
+            ret += ciaaPOSIX_read(fd_rs232, &rxBuf.buf[0], space - rawSpace);
+         }
+         (void)GetResource(RS2322IPR);
+         ciaaLibs_circBufUpdateTail(&rxBuf, ret);
+         (void)ReleaseResource(RS2322IPR);
+      }
+
+      /* blink output with each loop */
+      ciaaPOSIX_read(fd_out, &outputs, 1);
+      outputs ^= 0x80;
+      ciaaPOSIX_write(fd_out, &outputs, 1);
+
+      if(ret > 0)
+      {
+         Schedule();
+      }
+      else
+      {
+         WaitEvent(RS2322IPE);
+         ClearEvent(RS2322IPE);
+      }
+   }
+#endif
+   /* end EchoTask */
+   TerminateTask();
+}
+
+
+TASK(RS232WTASK)
+{
+#ifdef LWIP_HOOK_IP4_INPUT
+
+   char foo[] = "0: ";
    int8_t buf[20];   /* buffer for uart operation              */
    uint8_t outputs;  /* to store outputs status                */
-   int32_t ret;      /* return value variable for posix calls  */
 
    ciaaPOSIX_write(fd_rs232, "SerialEchoTask...\n", 18);
    /* send a message to the world :) */
@@ -227,19 +301,36 @@ TASK(EchoTask)
    ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)false); // this is the default value
    // ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)true);
 
+#ifdef LWIP_HOOK_IP4_INPUT
+   ciaaLibs_CircBufType ipBuf;
+   ciaaLibs_circBufInit(&ipBuf, ciaak_malloc(256), 256);
+
+   in_ip.cirbuf = &ipBuf;
+
+   in_ip.ffd_out = &fd_out;
+   GetTaskID(&in_ip.blocked_taskID);
+
+   f_load_out(&in_ip);
+#endif
+
    while(1)
    {
 
       /* wait for any character ... */
-      ret = ciaaPOSIX_read(fd_rs232, buf, 20);
+      WaitEvent(IP2RS232E);
+      ClearEvent(IP2RS232E);
 
-      if(ret > 0)
+      if( in_ip.size > 0)
       {
          /* also write them to the other device */
-         ciaaPOSIX_write(fd_rs232, buf, ret);
+         foo[0] = foo[0] == '9' ? '0' : foo[0]+1 ;
+         ciaaPOSIX_write(fd_rs232, foo, 3);
+         //  FIXME fetch
+         ciaaPOSIX_write(fd_rs232, in_ip.val, in_ip.size);
+         ciaaPOSIX_write(fd_rs232, "\n", 1);
       }
       else
-         ciaaPOSIX_write(fd_rs232, message, 49);
+         ciaaPOSIX_write(fd_rs232, "nada nuevo\n", 11);
 
 
       /* blink output 5 with each loop */
@@ -249,8 +340,7 @@ TASK(EchoTask)
 
       Schedule();
    }
-
-
+#endif
    /* end EchoTask */
    TerminateTask();
 }
@@ -269,9 +359,6 @@ TASK(PeriodicTask)
    int print_divider = 0;
 #endif
 
-#ifdef LWIP_HOOK_IP4_INPUT
-   f_load_out(&fd_out);
-#endif
 
    ciaaPOSIX_printf("echo_init()\n");
    /* start TCP echo example */

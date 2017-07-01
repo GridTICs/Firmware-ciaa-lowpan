@@ -23,22 +23,54 @@
 #define	GWIOT_NIVEL	LWIP_DBG_HALT  // para no mezclar otros mensajes
 #endif
 
-#define	GWIOT_NIVEL	(( LWIP_DBG_ON | LWIP_DBG_LEVEL_WARNING ))
 
 /* copia de descriptor de archivo para parpadear */
-static int *ffd_out;
+static struct tag_name *ip2rs232_tag;
 
-void f_load_out(int *m_out)
+static struct tag_name *rs232toip_tag;
+
+static ciaaLibs_CircBufType *rs232toip;
+static TaskType rs232toipTaskID;
+
+
+
+ssize_t fetch_buf(ciaaLibs_CircBufType * cbuf, uint8_t * const buf, size_t const nbyte)
 {
-  ffd_out = m_out;
+   ssize_t ret = 0;
+   bool full;
+
+   /* if the rx buffer is not empty */
+  (void)GetResource(RS2322IPR);
+   if (!ciaaLibs_circBufEmpty(cbuf))
+   {
+      full = ciaaLibs_circBufFull(cbuf);
+      /* try to read nbyte from irs232toip and store it to the user buffer */
+      ret = ciaaLibs_circBufGet(cbuf, buf, nbyte);
+      /* if the rs232toip buff was full and I got data */
+      if (full && ret)
+         SetEvent(rs232toipTaskID, RS2322IPE);
+   }
+  (void)ReleaseResource(RS2322IPR);
+   return ret;
+}
+
+ssize_t rs232_fetch(uint8_t * const buf, size_t const nbyte)
+{
+   return fetch_buf(rs232toip, buf, nbyte);
+}
+
+void f_load_out(struct tag_name *shared)
+{
+  ip2rs232_tag = shared;
   return;
 }
 
-
-
-struct tag_name {
-   char val[1800];
-};
+void rs232_load_buf(ciaaLibs_CircBufType *rxBuf, TaskType TTaskID)
+{
+    rs232toip = rxBuf;
+    rs232toipTaskID = TTaskID;
+    return;
+}
 
 
 int gwiot_ip4_input_hook(struct pbuf *p, struct netif *inp)
@@ -61,18 +93,18 @@ int gwiot_ip4_input_hook(struct pbuf *p, struct netif *inp)
    u8_t flags;
    uint8_t outputs = 0;
 
-   if( ffd_out == 0 )
+   if( ip2rs232_tag->ffd_out == 0 )
    {
       return 0;
    }
    else
    {
       /* read outputs */
-      ciaaPOSIX_read(*ffd_out, &outputs, 1);
+      ciaaPOSIX_read(*ip2rs232_tag->ffd_out, &outputs, 1);
       /* blink */
       outputs ^= 0x40;
       /* write */
-      ciaaPOSIX_write(*ffd_out, &outputs, 1);
+      ciaaPOSIX_write(*ip2rs232_tag->ffd_out, &outputs, 1);
    }
    if (old_type != p->type)
    {
@@ -150,14 +182,26 @@ int gwiot_ip4_input_hook(struct pbuf *p, struct netif *inp)
          if ( 0 < LIMM )
          {
             LWIP_DEBUGF(LWIP_GWIOT | GWIOT_NIVEL, ("000 "));
-            for (iteracion = 0 ; iteracion<LIMM ; iteracion++)
+            for (iteracion = 0 ; (iteracion<LIMM)&&(iteracion<(TAG_SIZE_MESG-1)) ; iteracion++)
                  LWIP_DEBUGF(LWIP_GWIOT | GWIOT_NIVEL, ("%d:", tst->val[iteracion]));
             LWIP_DEBUGF(LWIP_GWIOT | GWIOT_NIVEL, ("\n00  "));
-            for (iteracion = 0 ; iteracion<LIMM ; iteracion++)
+            for (iteracion = 0 ; (iteracion<LIMM)&&(iteracion<(TAG_SIZE_MESG-1)) ; iteracion++)
                  LWIP_DEBUGF(LWIP_GWIOT | GWIOT_NIVEL, ("%c", (char)tst->val[iteracion]));
             LWIP_DEBUGF(LWIP_GWIOT | GWIOT_NIVEL, ("\n"));
-            LWIP_DEBUGF(LWIP_GWIOT | GWIOT_NIVEL, ("...Imaginemos que dejo en memoria compartida....\n"));
-            // FIXME llevar a la memoria compartida
+
+            LWIP_DEBUGF(LWIP_GWIOT | GWIOT_NIVEL, ("........PreEvent\n"));
+
+            for (iteracion = 0 ; (iteracion<LIMM)&&(iteracion<(TAG_SIZE_MESG-1)) ; iteracion++)
+                 ip2rs232_tag->val[iteracion] = tst->val[iteracion];
+
+            ip2rs232_tag->val[iteracion] = '\0';
+            ip2rs232_tag->size = iteracion;
+
+            TaskType taskID = ip2rs232_tag->blocked_taskID;
+            SetEvent(taskID, IP2RS232E);
+
+            LWIP_DEBUGF(LWIP_GWIOT | GWIOT_NIVEL, ("........PostEvent\n"));
+
          }
          /* avanzo cabecera TCP */
          pbuf_header(p, (s16_t)tcphdrlen_bytes); /* cannot fail */
