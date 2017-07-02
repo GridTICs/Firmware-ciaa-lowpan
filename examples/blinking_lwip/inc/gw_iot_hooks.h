@@ -18,7 +18,7 @@
 #define TAG_SIZE_MESG 511
 
 /* Nivel de verbosidad para depuración */
-#define	GWIOT_NIVEL	(( LWIP_DBG_ON | LWIP_DBG_LEVEL_WARNING ))
+#define	GWIOT_NIVEL	(( LWIP_DBG_LEVEL_WARNING ))
 
 struct tag_name {
    char val[TAG_SIZE_MESG];

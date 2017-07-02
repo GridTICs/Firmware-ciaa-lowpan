@@ -2295,7 +2295,7 @@
 /**
  * Gateway IoT
  */
-#define	LWIP_GWIOT		LWIP_DBG_ON
+ #define	LWIP_GWIOT		LWIP_DBG_OFF
 
 #define GWIOT_ASSERT_RESET	0
 
