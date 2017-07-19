@@ -1987,7 +1987,7 @@
  * Llamado a hookear un la entrada IPv4,
  * comentar para desactivar
  */
-#define LWIP_USING_IP4INPUT_HOOK        1
+#define LWIP_USING_IP4INPUT_HOOK        0
 
 #if (( LWIP_USING_IP4INPUT_HOOK == 1 ))
 

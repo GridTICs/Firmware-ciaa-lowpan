@@ -279,8 +279,33 @@ TASK(RS232RTASK)
          ClearEvent(RS2322IPE);
       }
    }
-#endif
-   /* end EchoTask */
+#else
+#define TAMBUF 8
+   int32_t ret;
+   uint8_t outputs;
+   int8_t buf[TAMBUF];
+
+   ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)false); // this is the default value
+//   ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)true);
+
+   while(1)
+   {
+      ret = ciaaPOSIX_read(fd_rs232, buf, TAMBUF);
+      if(ret > 0)
+      {
+          ciaaPOSIX_write(fd_usb_uart, buf, ret);
+
+          /* blink output with each loop */
+          ciaaPOSIX_read(fd_out, &outputs, 1);
+          outputs ^= 0x80;
+          ciaaPOSIX_write(fd_out, &outputs, 1);
+      }
+
+      Schedule();
+   }
+#endif /* LWIP_HOOK_IP4_INPUT */
+
+   /* end Task */
    TerminateTask();
 }
 
@@ -340,8 +365,33 @@ TASK(RS232WTASK)
 
       Schedule();
    }
-#endif
-   /* end EchoTask */
+#else
+   int32_t ret;
+   uint8_t outputs;
+   int8_t buf[TAMBUF];
+
+   ciaaPOSIX_ioctl(fd_usb_uart, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)false); // this is the default value
+//   ciaaPOSIX_ioctl(fd_usb_uart, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)true);
+
+   while(1)
+   {
+      ret = ciaaPOSIX_read(fd_usb_uart, buf, TAMBUF);
+      if(ret > 0)
+      {
+         ciaaPOSIX_write(fd_rs232, buf, ret);
+
+         /* blink output with each loop */
+         ciaaPOSIX_read(fd_out, &outputs, 1);
+         outputs ^= 0x20;
+         ciaaPOSIX_write(fd_out, &outputs, 1);
+      }
+
+      Schedule();
+   }
+
+#endif /* LWIP_HOOK_IP4_INPUT */
+
+   /* end Task */
    TerminateTask();
 }
 
