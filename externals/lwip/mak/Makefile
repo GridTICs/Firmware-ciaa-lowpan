@@ -64,6 +64,7 @@ ext_lwip_SRC_FILES += $(wildcard $(ext_lwip_SRC_PATH)$(DS)core$(DS)ipv6$(DS)*.c)
 # LWIP'  NON TESTED code
 # ext_lwip_SRC_FILES += $(wildcard $(ext_lwip_SRC_PATH)$(DS)netif$(DS)ppp$(DS)*.c)
 # arch's drivers
+ext_lwip_SRC_FILES    += $(wildcard $(ext_lwip_PATH)$(DS)src$(DS)*.c)
 ext_lwip_SRC_FILES    += $(wildcard $(ext_lwip_PATH)$(DS)$(ARCH)$(DS)src$(DS)*.c)
 ext_lwip_SRC_FILES    += $(wildcard $(ext_lwip_PATH)$(DS)$(ARCH)$(DS)src$(DS)arch$(DS)*.c)
 ext_lwip_SRC_FILES    += $(wildcard $(ext_lwip_PATH)$(DS)$(ARCH)$(DS)$(CPUTYPE)$(DS)src$(DS)*.c)
