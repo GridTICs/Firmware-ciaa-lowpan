@@ -47,7 +47,8 @@ ext_lwip_INC_PATH   = $(ext_lwip_PATH)$(DS)lwip_src$(DS)src$(DS)include \
 # IPv6 Not yet tested, not implemented
 ext_lwip_INC_PATH  += $(ext_lwip_PATH)$(DS)lwip_src$(DS)src$(DS)include$(DS)ipv6
 # arch's Drivers
-ext_lwip_INC_PATH   += $(ext_lwip_PATH)$(DS)$(ARCH)$(DS)inc \
+ext_lwip_INC_PATH   += $(ext_lwip_PATH)$(DS)inc \
+	$(ext_lwip_PATH)$(DS)$(ARCH)$(DS)inc \
 	$(ext_lwip_PATH)$(DS)$(ARCH)$(DS)$(CPUTYPE)$(DS)inc \
 	$(ext_lwip_PATH)$(DS)$(ARCH)$(DS)$(CPUTYPE)$(DS)$(CPU)$(DS)inc
 

@@ -102,6 +102,9 @@ static int32_t fd_usb_uart;
  */
 static int32_t fd_rs232;
 
+/* sio_id */
+static u8_t sio_devnum;
+
 #ifdef LWIP_HOOK_IP4_INPUT
 static struct tag_name in_ip;
 #endif
@@ -168,6 +171,10 @@ TASK(InitTask)
 
    /* change FIFO TRIGGER LEVEL for rs 232 */
    ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_FIFO_TRIGGER_LEVEL, (void *)ciaaFIFO_TRIGGER_LEVEL3);
+
+   /* load file descriptor for sio_open() */
+   sio_devnum = sioPOSIX_load_fd(&fd_rs232);
+   /* TODO reenviar sio_devnum a ciaaDriverEth.c y desde ahí levantar una netif */
 
    char message[] = "Waiting for characters at port";
    // ciaaPOSIX_write(fd_usb_uart, message, ciaaPOSIX_strlen(message));

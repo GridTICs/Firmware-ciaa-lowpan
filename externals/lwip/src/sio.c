@@ -2,16 +2,54 @@
 #include "lwip/arch.h"
 #include "lwip/opt.h"
 
+#include "ciaaLwip_sio.h"
 #include "lwip/sio.h"
 
-/* If you want to define sio_fd_t elsewhere or differently,
-   define this in your cc.h file. */
-// #ifndef __sio_fd_t_defined
-// typedef void * sio_fd_t;
-// #endif
+#include "ciaaPOSIX_stdbool.h" // bool
 
-/* The following functions can be defined to something else in your cc.h file
-   or be implemented in your custom sio.c file. */
+#define NUMSIODEVS 4
+
+
+struct sio_match {
+   int32_t * fdposix;
+   bool uart_poll;
+   // sio_fd_t fdposix;
+};
+
+
+static struct sio_match sio_m[NUMSIODEVS];
+
+/**
+ * recoger el id de que responde a ese descriptor de archivo
+ */
+u8_t sioPOSIX_get_id(int32_t * fd_posix)
+{
+   int i = 0;
+
+   for (i=0 ; i<NUMSIODEVS ; i++) {
+      if (sio_m[i].fdposix == fd_posix) {
+         return (i+1);
+      }
+   }
+   return 0;
+}
+
+/**
+ * cargar a memoria local el descriptor de archivo
+ */
+u8_t sioPOSIX_load_fd(int32_t * fd_pos)
+{
+   u8_t i = 0;
+
+   for (i=0 ; i<NUMSIODEVS ; i++) {
+      if (sio_m[i].fdposix == NULL) {
+         sio_m[i].fdposix = fd_pos;
+         return (i+1);
+      }
+   }
+   return sioPOSIX_get_id(fd_pos);
+}
+
 
 /**
  * Opens a serial device for communication.
@@ -21,8 +59,9 @@
  */
 sio_fd_t sio_open(u8_t devnum)
 {
-   // FIXME implementar apertura real del dispositivo
-   return (sio_fd_t)1;
+   // la apartura real del dispositivo debería estar hecha previamente y cargada vía sioPOSIX_load_fd()
+   /// FIXME forzar que el modo de operaci'on sea no bloqueante
+   return (sio_fd_t)sio_m[ devnum-1 ].fdposix;
 }
 
 /**
@@ -33,9 +72,9 @@ sio_fd_t sio_open(u8_t devnum)
  *
  * @note This function will block until the character can be sent.
  */
-void sio_send(u8_t c, sio_fd_t fd)
+void sio_send(u8_t c, sio_fd_t fdp)
 {
-   // FIXME implementar el envío datos
+   ciaaPOSIX_write((int32_t) *fdp, &c, 1);
    return;
 }
 
@@ -62,10 +101,18 @@ void sio_send(u8_t c, sio_fd_t fd)
  * @note This function will block until data can be received. The blocking
  * can be cancelled by calling sio_read_abort().
  */
-u32_t sio_read(sio_fd_t fd, u8_t *data, u32_t len)
+u32_t sio_read(sio_fd_t fdp, u8_t *data, u32_t len)
 {
-   // FIXME escribir como bloqueante
-   return (u32_t)1;
+   u32_t r_len = 0;
+   u8_t id = sioPOSIX_get_id( (int32_t *) fdp );
+   bool * upoll = & sio_m[ id-1 ].uart_poll;
+   *upoll = true;
+
+   // bloqueante
+   while ( r_len == 0 && *upoll == true ) {
+      r_len = ciaaPOSIX_read((int32_t) *fdp, data, len);
+   }
+   return r_len;
 }
 
 /**
@@ -77,10 +124,9 @@ u32_t sio_read(sio_fd_t fd, u8_t *data, u32_t len)
  * @param len maximum length (in bytes) of data to receive
  * @return number of bytes actually received
  */
-u32_t sio_tryread(sio_fd_t fd, u8_t *data, u32_t len)
+u32_t sio_tryread(sio_fd_t fdp, u8_t *data, u32_t len)
 {
-   // FIXME escribir como no bloqueante
-   return (u32_t)1;
+   return ciaaPOSIX_read((int32_t) *fdp, data, len);
 }
 
 #ifndef sio_write
@@ -103,9 +149,8 @@ u32_t sio_tryread(sio_fd_t fd, u8_t *data, u32_t len)
  *
  * @param fd serial device handle
  */
-void sio_read_abort(sio_fd_t fd)
+void sio_read_abort(sio_fd_t fdp)
 {
-   // FIXME estudiar implementación
+   sio_m[ sioPOSIX_get_id( (int32_t *) fdp )-1 ].uart_poll = false;
    return;
 }
-

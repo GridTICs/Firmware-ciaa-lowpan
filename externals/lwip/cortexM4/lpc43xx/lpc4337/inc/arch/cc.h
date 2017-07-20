@@ -126,5 +126,7 @@ void assert_loop(void);
 
 #define LWIP_RAND() ((u32_t)rand())
 
+/*  for sio.c working with ciaaPOSIX_write and ciaaPOIX_read  */
+#include "ciaaLwip_sio.h"
 
 #endif /* __CC_H__ */ 
