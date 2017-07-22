@@ -196,9 +196,6 @@ netif_add(
 #if LWIP_DHCP
    dhcp_start(&lpc_netif);
 #endif
-#if LWIP_IPV6
-   show_ipv6_addr();
-#endif
 }
 
 #if LWIP_IPV6
