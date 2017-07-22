@@ -54,6 +54,7 @@
 #include "arch/lpc18xx_43xx_emac.h"
 #include "arch/lpc_arch.h"
 #include "netif/etharp.h"
+#include "contikibr.h" // ctk_br_input
 
 
 #include "lwip/init.h"
@@ -70,6 +71,7 @@
 #endif /*  LWIP_VERSION == CIAA_LWIP_141 */
 
 #include "lwip/netif.h"
+#include "netif/slipif.h"
 #include "lwip/init.h"
 
 #if LWIP_DHCP
@@ -87,6 +89,7 @@
 /*==================[internal data declaration]==============================*/
 /* NETIF data */
 static struct netif lpc_netif;
+static struct netif ctk_slipif;
 
 static uint32_t physts;
 
@@ -118,6 +121,32 @@ static void prvSetupHardware(void)
    /* Setup a 1mS sysTick for the primary time base */
    lwipSysTick_Enable(1);
 }
+
+#if LWIP_IPV6
+void show_ipv6_addr(void)
+{
+   ip_addr_t *ptr;
+   char tmp_buff[IP6ADDR_STRLEN_MAX];
+   int8_t i;
+
+   // IPv6 addresses
+   for (i=0; i<LWIP_IPV6_NUM_ADDRESSES; i++) {
+       if (lpc_netif.ip6_addr_state[i] != IP6_ADDR_INVALID) {
+           ptr = &lpc_netif.ip6_addr[i];
+	   ipaddr_ntoa_r(ptr, tmp_buff, sizeof(tmp_buff));
+           ciaaPOSIX_printf("%c%c IP6_ADDR[%d]: %s\r\n", lpc_netif.name[0], lpc_netif.name[1], i, tmp_buff);
+       }
+   }
+   for (i=0; i<LWIP_IPV6_NUM_ADDRESSES; i++) {
+       if (ctk_slipif.ip6_addr_state[i] != IP6_ADDR_INVALID) {
+           ptr = &ctk_slipif.ip6_addr[i];
+	   ipaddr_ntoa_r(ptr, tmp_buff, sizeof(tmp_buff));
+           ciaaPOSIX_printf("%c%c IP6_ADDR[%d]: %s\r\n", ctk_slipif.name[0], ctk_slipif.name[1], i, tmp_buff);
+       }
+   }
+}
+#endif
+
 /*==================[internal data definition]===============================*/
 
 /*==================[external data definition]===============================*/
@@ -126,15 +155,69 @@ static void prvSetupHardware(void)
 
 /*==================[external functions definition]==========================*/
 
-void ciaaDriverEth_init(void)
+
+void ciaaDriverSlip_init(void)
+{
+#if LWIP_IPV6
+    static ip4_addr_t  ipaddr, netmask, gw;
+    ip6_addr_t addr6;
+    ip6_addr_t * paddr6; // para que el wharning no moleste
+
+   /* Static IP assignment */
+#if  (( LWIP_DHCP && 0 ))
+   IP4_ADDR(&gw, 0, 0, 0, 0);
+   IP4_ADDR(&ipaddr, 0, 0, 0, 0);
+   IP4_ADDR(&netmask, 0, 0, 0, 0);
+#else
+   /* https://en.wikipedia.org/wiki/Reserved_IP_addresses#IPv4 */
+   IP4_ADDR(&gw, 0,0,0,0);
+   IP4_ADDR(&ipaddr, 198,18,0,10);
+   IP4_ADDR(&netmask, 255, 255, 255, 0);
+#endif
+
+   /* Add netif interface for lpc17xx_8x */
+   netif_add(&ctk_slipif, &ipaddr, &netmask, &gw, NULL, slipif_init, ctk_br_input);
+
+//   netif_create_ip6_linklocal_address(&ctk_slipif, 0); // if != 0, assume hwadr is a 48-bit MAC address (std conversion)
+
+   paddr6 = &addr6;
+   IP6_ADDR(paddr6,
+      PP_HTONL(0xfe800000ul),
+      0,
+      0,
+      PP_HTONL(0x00000001ul));
+   netif_ip6_addr_set(&ctk_slipif, 0, paddr6);
+   netif_ip6_addr_set_state(&ctk_slipif, 0, IP6_ADDR_VALID);
+
+
+#if CIAA_LWIP_VERSION != CIAA_LWIP_141
+/*  This is the hardware link state; e.g. whether cable is plugged for wired
+**  Ethernet interface. This function must be called even if you don't know
+**  the current state. Having link up and link down events is optional but
+**  DHCP and IPv6 discover benefit well from those events */
+   netif_set_link_up(&lpc_netif);
+#endif /* LWIP_VERSION != CIAA_LWIP_141 */
+
+
+   IP6_ADDR(paddr6,
+      PP_HTONL(0xfd000000ul),
+      0,
+      0,
+      PP_HTONL(0x00000001ul));
+
+   netif_ip6_addr_set(&ctk_slipif, 1, paddr6);
+   netif_ip6_addr_set_state(&ctk_slipif, 1, IP6_ADDR_VALID);
+
+   netif_set_up(&ctk_slipif);
+#endif  /* #if LWIP_IPV6 */
+}
+
+void ciaaDriverEth_initE(void)
 {
     static ip4_addr_t  ipaddr, netmask, gw;
 
    /* init Ethernet Hardware */
    prvSetupHardware();
-
-   /* Initialize LWIP */
-   lwip_init();
 
    /* Static IP assignment */
 #if LWIP_DHCP
@@ -198,24 +281,13 @@ netif_add(
 #endif
 }
 
-#if LWIP_IPV6
-void show_ipv6_addr(void)
+void ciaaDriverEth_init(void)
 {
-   uint8_t i;
-   ip_addr_t  my_address = {{{{0}}},0}; 
-   char tmp_buff[IP6ADDR_STRLEN_MAX];
- 
-  // IPv6 addresses
-   for (i=0; i<LWIP_IPV6_NUM_ADDRESSES; i++) {
-       if (lpc_netif.ip6_addr_state[i] != IP6_ADDR_INVALID) {
-           my_address = lpc_netif.ip6_addr[i];
-           my_address.type = IPADDR_TYPE_V6;
-	   ipaddr_ntoa_r(&my_address, tmp_buff, sizeof(tmp_buff));
-           ciaaPOSIX_printf("IP6_ADDR[%d]: %s\r\n", i, tmp_buff);
-       }
-   }
+   /* Initialize LWIP */
+   lwip_init();
+   ciaaDriverEth_initE();
+   ciaaDriverSlip_init();
 }
-#endif
 
 void ciaaDriverEth_mainFunction(void)
 {
