@@ -72,6 +72,10 @@
 #include "lwip/netif.h"
 #include "lwip/init.h"
 
+#if LWIP_DHCP
+#include "lwip/dhcp.h"
+#endif
+
 #if LWIP_VERSION_MAJOR == 1U
 #include "lwip/timers.h"
 #else /* LWIP_VERSION_MAJOR == 1U */
@@ -172,9 +176,12 @@ netif_add(
 
 #if LWIP_IPV6
    netif_create_ip6_linklocal_address(&lpc_netif, 1); // if != 0, assume hwadr is a 48-bit MAC address (std conversion)
-
-   netif_set_ip6_autoconfig_enabled(&lpc_netif, 1);
+   {
+   struct netif * ptr = &lpc_netif;
+   netif_set_ip6_autoconfig_enabled(ptr, 1);
+   }
 #endif
+
    netif_set_default(&lpc_netif);
 #if CIAA_LWIP_VERSION != CIAA_LWIP_141
 /*  This is the hardware link state; e.g. whether cable is plugged for wired
