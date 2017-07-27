@@ -109,6 +109,9 @@ static u8_t sio_devnum;
 static struct tag_name in_ip;
 #endif
 
+// leer en rs232 y escribir eso mismo en ftdi-uart y viceversa
+#define CROSSMIRROR 0
+
 
 static unsigned int repeat_show = 1;
 #define LIM_SHOW_COUNTER	30
@@ -286,7 +289,7 @@ TASK(RS232RTASK)
          ClearEvent(RS2322IPE);
       }
    }
-#else
+#elif CROSSMIRROR
 #define TAMBUF 8
    int32_t ret;
    uint8_t outputs;
@@ -372,7 +375,7 @@ TASK(RS232WTASK)
 
       Schedule();
    }
-#else
+#elif CROSSMIRROR
    int32_t ret;
    uint8_t outputs;
    int8_t buf[TAMBUF];
