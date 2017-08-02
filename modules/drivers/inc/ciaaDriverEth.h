@@ -33,6 +33,9 @@
 
 #ifndef CIAADRIVERETH_H
 #define CIAADRIVERETH_H
+
+#include "lwip/arch.h" // u8_t
+
 /** \brief CIAA Ethernet driver header file
  **
  ** This files contains the header file of the CIAA Ethernet driver
@@ -74,6 +77,10 @@ extern void ciaaDriverEth_mainFunction(void);
 #if LWIP_IPV6
 void show_ipv6_addr(void);
 #endif
+
+void load_sio_id(u8_t *idx);
+
+
 
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus

@@ -91,6 +91,8 @@
 static struct netif lpc_netif;
 static struct netif ctk_slipif;
 
+static u8_t *sio_id; //!< identificador de UART para slipif
+
 static uint32_t physts;
 
 static const PINMUX_GRP_T pinmuxing[] = {
@@ -156,12 +158,21 @@ void show_ipv6_addr(void)
 /*==================[external functions definition]==========================*/
 
 
+void load_sio_id(u8_t *idx)
+{
+   sio_id = idx;
+   return;
+}
+
 void ciaaDriverSlip_init(void)
 {
 #if LWIP_IPV6
     static ip4_addr_t  ipaddr, netmask, gw;
     ip6_addr_t addr6;
     ip6_addr_t * paddr6; // para que el wharning no moleste
+
+    ctk_slipif.state = (void *)sio_id;
+
 
    /* Static IP assignment */
 #if  (( LWIP_DHCP && 0 ))
@@ -189,22 +200,11 @@ void ciaaDriverSlip_init(void)
    netif_ip6_addr_set(&ctk_slipif, 0, paddr6);
    netif_ip6_addr_set_state(&ctk_slipif, 0, IP6_ADDR_VALID);
 
-
-#if CIAA_LWIP_VERSION != CIAA_LWIP_141
-/*  This is the hardware link state; e.g. whether cable is plugged for wired
-**  Ethernet interface. This function must be called even if you don't know
-**  the current state. Having link up and link down events is optional but
-**  DHCP and IPv6 discover benefit well from those events */
-   netif_set_link_up(&lpc_netif);
-#endif /* LWIP_VERSION != CIAA_LWIP_141 */
-
-
    IP6_ADDR(paddr6,
       PP_HTONL(0xfd000000ul),
       0,
       0,
       PP_HTONL(0x00000001ul));
-
    netif_ip6_addr_set(&ctk_slipif, 1, paddr6);
    netif_ip6_addr_set_state(&ctk_slipif, 1, IP6_ADDR_VALID);
 
@@ -286,11 +286,19 @@ void ciaaDriverEth_init(void)
    /* Initialize LWIP */
    lwip_init();
    ciaaDriverEth_initE();
-   ciaaDriverSlip_init();
+}
+
+void ciaaDriverSlipmainFunction(void)
+{
+   ;
 }
 
 void ciaaDriverEth_mainFunction(void)
 {
+
+   /* slip queue */
+   slipif_poll(&ctk_slipif);
+
    /* Handle packets as part of this loop, not in the IRQ handler */
    lpc_enetif_input(&lpc_netif);
 

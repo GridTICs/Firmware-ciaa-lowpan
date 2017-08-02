@@ -177,6 +177,9 @@ TASK(InitTask)
 
    /* load file descriptor for sio_open() */
    sio_devnum = sioPOSIX_load_fd(&fd_rs232);
+   load_sio_id(&sio_devnum);
+   ciaaDriverSlip_init();
+
    /* TODO reenviar sio_devnum a ciaaDriverEth.c y desde ahí levantar una netif */
 
    char message[] = "Waiting for characters at port";
@@ -203,8 +206,14 @@ TASK(InitTask)
    ciaaPOSIX_printf("ActivateTask(PeriodicTask);\n");
    /* activate lwip loop as a background loop */
    ActivateTask(PeriodicTask);
+
+#ifdef LWIP_HOOK_IP4_INPUT
    ActivateTask(RS232WTASK);
    ActivateTask(RS232RTASK);
+#elif CROSSMIRROR
+   ActivateTask(RS232WTASK);
+   ActivateTask(RS232RTASK);
+#endif
 
    TerminateTask();
 }
