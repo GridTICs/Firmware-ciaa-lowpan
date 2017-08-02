@@ -75,7 +75,7 @@ sio_fd_t sio_open(u8_t devnum)
  */
 void sio_send(u8_t c, sio_fd_t fdp)
 {
-   ciaaPOSIX_write((int32_t) *fdp, &c, 1);
+   (void) ciaaPOSIX_write( *((int32_t *)fdp), &c, 1);
    return;
 }
 
@@ -102,7 +102,7 @@ void sio_send(u8_t c, sio_fd_t fdp)
  * @note This function will block until data can be received. The blocking
  * can be cancelled by calling sio_read_abort().
  */
-u32_t sio_read(sio_fd_t fdp, u8_t *data, u32_t len)
+ssize_t giot_sio_read(sio_fd_t fdp, u8_t *data, u32_t len)
 {
    u32_t r_len = 0;
    u8_t id = sioPOSIX_get_id( (int32_t *) fdp );
@@ -111,7 +111,7 @@ u32_t sio_read(sio_fd_t fdp, u8_t *data, u32_t len)
 
    // bloqueante
    while ( r_len == 0 && *upoll == true ) {
-      r_len = ciaaPOSIX_read((int32_t) *fdp, data, len);
+      r_len = ciaaPOSIX_read(*((int32_t *) fdp), data, len);
    }
    return r_len;
 }
@@ -125,7 +125,7 @@ u32_t sio_read(sio_fd_t fdp, u8_t *data, u32_t len)
  * @param len maximum length (in bytes) of data to receive
  * @return number of bytes actually received
  */
-u32_t sio_tryread(sio_fd_t fdp, u8_t *data, u32_t len)
+ssize_t giot_sio_tryread(sio_fd_t fdp, u8_t *data, u32_t len)
 {
    return ciaaPOSIX_read((int32_t) *fdp, data, len);
 }
