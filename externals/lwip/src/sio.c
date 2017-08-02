@@ -61,6 +61,7 @@ sio_fd_t sio_open(u8_t devnum)
 {
    // la apartura real del dispositivo debería estar hecha previamente y cargada vía sioPOSIX_load_fd()
    /// FIXME forzar que el modo de operaci'on sea no bloqueante
+   ciaaPOSIX_ioctl(*sio_m[ devnum-1 ].fdposix, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)true);
    return (sio_fd_t)sio_m[ devnum-1 ].fdposix;
 }
 
