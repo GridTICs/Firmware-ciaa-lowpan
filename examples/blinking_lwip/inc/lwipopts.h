@@ -2260,7 +2260,7 @@
 /**
  * SLIP_DEBUG: Enable debugging in slipif.c.
  */
-#define SLIP_DEBUG                      LWIP_DBG_OFF
+#define SLIP_DEBUG                      LWIP_DBG_ON
 
 /**
  * DHCP_DEBUG: Enable debugging in dhcp.c.
