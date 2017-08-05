@@ -14,18 +14,18 @@ ctk_br_input(struct pbuf *p, struct netif *inp)
    if (p == NULL)
       return ERR_VAL;
 
-   ciaaPOSIX_printf("VAL: ");
-   ciaaPOSIX_printf("%d ", p->len);
+   LWIP_DEBUGF(SLIP_DEBUG, ("VAL: "));
+   LWIP_DEBUGF(SLIP_DEBUG, ("%d ", p->len));
 
    u8_t * payload = (u8_t *)p->payload;
 
 /*
    for (i=0 ; i < p->len ; i++)
-       ciaaPOSIX_printf("%x", payload[i]);
-   ciaaPOSIX_printf(" (");
+       LWIP_DEBUGF(SLIP_DEBUG, ("%x", payload[i]));
+   LWIP_DEBUGF(SLIP_DEBUG, (" ("));
    for (i=0 ; i < p->len ; i++)
-       ciaaPOSIX_printf("%c", payload[i]);
-   ciaaPOSIX_printf(")\r\n");
+       LWIP_DEBUGF(SLIP_DEBUG, ("%c", payload[i]));
+   LWIP_DEBUGF(SLIP_DEBUG, (")\r\n"));
 */
 
    if (p->len == 2) {
@@ -35,7 +35,7 @@ ctk_br_input(struct pbuf *p, struct netif *inp)
          out->next = NULL;
          out->len = 10;
          out->payload = (void *)&resp_6_addr;
-         // ciaaPOSIX_printf("Enviando direccion");
+         LWIP_DEBUGF(SLIP_DEBUG, ("Enviando direccion de red al mote\n"));
          inp->output_ip6(inp, out, (ip6_addr_t *)NULL);
       }
       return ERR_OK;
