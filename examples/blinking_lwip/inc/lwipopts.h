@@ -1801,12 +1801,12 @@
 /**
  * LWIP_IPV6_FORWARD==1: Forward IPv6 packets across netifs
  */
-// #define LWIP_IPV6_FORWARD               0
+#define LWIP_IPV6_FORWARD               1
 
 /**
  * LWIP_IPV6_FRAG==1: Fragment outgoing IPv6 packets that are too big.
  */
-// #define LWIP_IPV6_FRAG                  0
+#define LWIP_IPV6_FRAG                  1
 
 /**
  * LWIP_IPV6_REASS==1: reassemble incoming IPv6 packets that fragmented
