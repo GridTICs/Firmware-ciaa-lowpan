@@ -208,6 +208,7 @@ void ciaaDriverSlip_init(void)
    netif_ip6_addr_set(&ctk_slipif, 1, paddr6);
    netif_ip6_addr_set_state(&ctk_slipif, 1, IP6_ADDR_VALID);
 
+   netif_set_link_up(&ctk_slipif);
    netif_set_up(&ctk_slipif);
 #endif  /* #if LWIP_IPV6 */
 }
