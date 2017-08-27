@@ -193,6 +193,7 @@ TASK(InitTask)
    char formamem[] = "estatica";
 #endif
 
+   MTS_PLATFORM_DIAG(("\nBuild date %s %s", __DATE__, __TIME__));
    MTS_PLATFORM_DIAG(("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d - usando memoria %s\n",
       LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR, LWIP_VERSION_REVISION,
       LWIP_VERSION_RC, LWIP_DHCP,
