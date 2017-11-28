@@ -451,10 +451,7 @@ static err_t lpc_low_level_output(struct netif *netif, struct pbuf *sendp)
 #if NO_SYS == 0
 	{xSemaphoreTake(lpc_netifdata->xTXDCountSem, 0); }
 #else
-	{
-		msDelay(1);
-		lpc_tx_reclaim(netif);
-	}
+	{msDelay(1); }
 #endif
 
 	/* Get the next free descriptor index */
