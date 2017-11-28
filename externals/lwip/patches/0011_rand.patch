@@ -1,0 +1,11 @@
+diff -urN CIAAFirmware/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/cc.h CIAAFirmware.orig/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/cc.h
+--- CIAAFirmware/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/cc.h	2017-11-27 21:53:54.212993465 -0300
++++ CIAAFirmware.orig/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/cc.h	2017-11-27 21:54:30.291024112 -0300
+@@ -124,4 +124,6 @@
+  * @}
+  */
+ 
++#define LWIP_RAND() ((u32_t)rand())
++
+ #endif /* __CC_H__ */ 
+Binary files CIAAFirmware/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/.cc.h.swp and CIAAFirmware.orig/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/.cc.h.swp differ
