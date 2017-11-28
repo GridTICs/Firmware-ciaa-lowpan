@@ -1,0 +1,15 @@
+--- lwip-ciaa/externals/lwip/cortexM4/lpc43xx/lpc4337/src/arch/lpc18xx_43xx_emac.c	2017-11-27 22:40:29.593917453 -0300
++++ lwip/externals/lwip/cortexM4/lpc43xx/lpc4337/src/arch/lpc18xx_43xx_emac.c	2017-11-27 22:50:38.045976171 -0300
+@@ -434,7 +434,11 @@
+ #if NO_SYS == 0
+ 	{xSemaphoreTake(lpc_netifdata->xTXDCountSem, 0); }
+ #else
+-	{msDelay(1); }
++	{
++		/* Bugfix: we shoud reclaim tx, nobody will do it for us  */
++		msDelay(1);
++		lpc_tx_reclaim(netif);
++	}
+ #endif
+ 
+ 	/* Get the next free descriptor index */

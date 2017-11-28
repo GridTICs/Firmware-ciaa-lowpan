@@ -61,6 +61,7 @@ patch -p1 < $LWIPDIR/patches/0008_lwip_2_0_0_compatibility.patch
 patch -p1 < $LWIPDIR/patches/0009_mem_alignment.patch
 patch -p1 < $LWIPDIR/patches/0010_lwip_dialogs.patch
 patch -p1 < $LWIPDIR/patches/0011_rand.patch
+patch -p1 < $LWIPDIR/patches/0012_bugfix_tx.patch
 
 
 # Returning to called directory
