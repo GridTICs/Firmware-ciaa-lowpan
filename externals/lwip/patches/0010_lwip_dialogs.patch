@@ -1,0 +1,20 @@
+diff -urN lwip-ciaa/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/cc.h lwip/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/cc.h
+--- lwip-ciaa/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/cc.h	2017-11-27 21:20:06.263574807 -0300
++++ lwip/externals/lwip/cortexM4/lpc43xx/lpc4337/inc/arch/cc.h	2017-11-27 21:00:39.784656853 -0300
+@@ -34,6 +34,7 @@
+ 
+ #include <stdint.h>
+ #include <stdio.h>
++#include "ciaaPOSIX_stdio.h"
+ 
+ /** @ingroup NET_LWIP_ARCH
+  * @{
+@@ -106,7 +107,7 @@
+ void assert_printf(char *msg, int line, char *file);
+ 
+ /* Plaform specific diagnostic output */
+-#define LWIP_PLATFORM_DIAG(vars) printf vars
++#define LWIP_PLATFORM_DIAG(vars) ciaaPOSIX_printf vars
+ #define LWIP_PLATFORM_ASSERT(flag) { assert_printf((flag), __LINE__, __FILE__); }
+ #else
+ 
