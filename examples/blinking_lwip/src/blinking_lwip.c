@@ -172,20 +172,18 @@ TASK(InitTask)
 
    char message[] = "Waiting for characters at port";
    // ciaaPOSIX_write(fd_usb_uart, message, ciaaPOSIX_strlen(message));
-   // MTS_PLATFORM_DIAG(( message ));
+   // ciaaPOSIX_printf( message );
    // dbg_send(message, ciaaPOSIX_strlen(message));
 
+   ciaaPOSIX_printf("\nBuild date %s %s", __DATE__, __TIME__);
 #if ( OSEKMEM == 1 )
-   char formamem[] = "posix dinamica";
+   ciaaPOSIX_printf("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d - usando memoria posix dinamica\n",
 #else
-   char formamem[] = "estatica";
+   ciaaPOSIX_printf("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d - usando memoria estatica\n",
 #endif
-
-   MTS_PLATFORM_DIAG(("\nBuild date %s %s", __DATE__, __TIME__));
-   MTS_PLATFORM_DIAG(("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d - usando memoria %s\n",
       LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR, LWIP_VERSION_REVISION,
       LWIP_VERSION_RC, LWIP_DHCP,
-      message, 8000, formamem));
+      message, 8000);
 
 
    ciaaPOSIX_printf("SetRelAlarm(ActivateBlinkTask, 250, 250);\n");
@@ -225,9 +223,6 @@ TASK(BlinkTask)
 TASK(PeriodicTask)
 {
 
-   uint8_t msg_size =  5;
-   uint16_t mostrar = 0;
-
 // #define DOTDEBUG
 #ifdef DOTDEBUG
    int print_divider = 0;
@@ -257,7 +252,6 @@ TASK(PeriodicTask)
          repeat_show--;
          show_counter = 0;
       }
-
 
       /* lwip stack periodic loop */
       ciaaDriverEth_mainFunction();

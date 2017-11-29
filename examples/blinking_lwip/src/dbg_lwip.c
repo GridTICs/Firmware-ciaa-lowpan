@@ -1,8 +1,9 @@
+/* FIXME copyright */
 #include "dbg_lwip.h" 
 
-// ciaaPOSIX_write
 #include "ciaaPOSIX_stdio.h"
 
+/* envio bloqueante por UART */
 #define SENDBLOCK 0
 #if SENDBLOCK
 /*  TODO traer desde las bibliotcas el s'imbolo LPC_USART2 para dejar
@@ -18,6 +19,8 @@
 
 #include "chip.h"
 #define MYSTDOUT LPC_USART2
+
+#warning se enviarán los datos invocando función bloqueante
 #endif /* SENDBLOCK */
 
 // vsprintf()

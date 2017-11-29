@@ -1,3 +1,4 @@
+/* FIXME copyright */
 #ifndef LWIP_DBG_H
 
 #define LWIP_DBG_H
@@ -16,11 +17,6 @@ int dbg_send(void *data, int datalen);
 /* printf in the loaded UART */
 void dbg_printf(const char * const fmt, ...);
 
-#define dbgPrint(x)	dbg_send((void*)(x), ciaaPOSIX_strlen(x))
-
-#define MTS_PLATFORM_DIAG(x)   dbg_printf x ;
-
 #define ciaaPOSIX_printf  dbg_printf
-
 
 #endif
