@@ -47,6 +47,8 @@
 #include "lwip/tcp.h"
 #include "echo.h"
 
+#include "gw_iot_hooks.h"
+
 #if LWIP_TCP
 
 static struct tcp_pcb *echo_pcb;
