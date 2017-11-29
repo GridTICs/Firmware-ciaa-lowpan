@@ -109,10 +109,6 @@ static u8_t sio_devnum;
 static struct tag_name in_ip;
 #endif
 
-// leer en rs232 y escribir eso mismo en ftdi-uart y viceversa
-#define CROSSMIRROR 0
-
-
 static unsigned int repeat_show = 1;
 #define LIM_SHOW_COUNTER	30
 static unsigned int show_counter = 0;
@@ -211,9 +207,6 @@ TASK(InitTask)
 #ifdef LWIP_HOOK_IP4_INPUT
    ActivateTask(RS232WTASK);
    ActivateTask(RS232RTASK);
-#elif CROSSMIRROR
-   ActivateTask(RS232WTASK);
-   ActivateTask(RS232RTASK);
 #endif
 
    TerminateTask();
@@ -299,30 +292,6 @@ TASK(RS232RTASK)
          ClearEvent(RS2322IPE);
       }
    }
-#elif CROSSMIRROR
-#define TAMBUF 8
-   int32_t ret;
-   uint8_t outputs;
-   int8_t buf[TAMBUF];
-
-   ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)false); // this is the default value
-//   ciaaPOSIX_ioctl(fd_rs232, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)true);
-
-   while(1)
-   {
-      ret = ciaaPOSIX_read(fd_rs232, buf, TAMBUF);
-      if(ret > 0)
-      {
-          ciaaPOSIX_write(fd_usb_uart, buf, ret);
-
-          /* blink output with each loop */
-          ciaaPOSIX_read(fd_out, &outputs, 1);
-          outputs ^= 0x80;
-          ciaaPOSIX_write(fd_out, &outputs, 1);
-      }
-
-      Schedule();
-   }
 #endif /* LWIP_HOOK_IP4_INPUT */
 
    /* end Task */
@@ -385,29 +354,6 @@ TASK(RS232WTASK)
 
       Schedule();
    }
-#elif CROSSMIRROR
-   int32_t ret;
-   uint8_t outputs;
-   int8_t buf[TAMBUF];
-
-   ciaaPOSIX_ioctl(fd_usb_uart, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)false); // this is the default value
-//   ciaaPOSIX_ioctl(fd_usb_uart, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)true);
-
-   while(1)
-   {
-      ret = ciaaPOSIX_read(fd_usb_uart, buf, TAMBUF);
-      if(ret > 0)
-      {
-         ciaaPOSIX_write(fd_rs232, buf, ret);
-
-         /* blink output with each loop */
-         ciaaPOSIX_read(fd_out, &outputs, 1);
-         outputs ^= 0x20;
-         ciaaPOSIX_write(fd_out, &outputs, 1);
-      }
-
-      Schedule();
-   }
 
 #endif /* LWIP_HOOK_IP4_INPUT */
 
@@ -420,7 +366,6 @@ TASK(RS232WTASK)
 TASK(PeriodicTask)
 {
 
-   char msg[] = "hola\n";
    uint8_t msg_size =  5;
    uint16_t mostrar = 0;
 
@@ -453,12 +398,6 @@ TASK(PeriodicTask)
          repeat_show--;
          show_counter = 0;
       }
-
-#if 0
-      /* show loop message */
-      if (mostrar++ == 0)
-          ciaaPOSIX_write(fd_rs232, msg, msg_size);
-#endif
 
 
       /* lwip stack periodic loop */
