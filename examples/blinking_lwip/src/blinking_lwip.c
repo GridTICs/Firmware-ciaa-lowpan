@@ -2,9 +2,14 @@
  * Copyright 2014, Pablo Ridolfi
  * Copyright 2014, Juan Cecconi
  * Copyright 2014, Gustavo Muro
+ * Copyright 2016, 2017 Matias Pecchia
+ * Copyright 2016, 2017 Juan Carlos Taffernaberry
+ * Copyright 2016, 2017 Ana Laura Diedrochs
+ * Copyright 2016, 2017 Gustavo Mercado
  * All rights reserved.
  *
- * This file is part of CIAA Firmware.
+ * This file is part of Gridtics Gateway-IoT Firmware.
+ *    Based on CIAA Firmware.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -54,12 +59,6 @@
  * PR           Pablo Ridolfi
  * JuCe         Juan Cecconi
  * GMuro        Gustavo Muro
- */
-
-/*
- * modification history (new versions first)
- * -----------------------------------------------------------
- * 20140731 v0.0.1   PR first functional version
  */
 
 /*==================[inclusions]=============================================*/
