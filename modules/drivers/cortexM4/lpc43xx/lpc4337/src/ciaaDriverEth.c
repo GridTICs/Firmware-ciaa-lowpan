@@ -167,10 +167,27 @@ void load_sio_id(u8_t *idx)
 void ciaaDriverSlip_init(void)
 {
 #if LWIP_IPV6
+    static ip4_addr_t  ipaddr, netmask, gw;
     ip6_addr_t addr6;
     ip6_addr_t * paddr6; // para que el wharning no moleste
 
     ctk_slipif.state = (void *)sio_id;
+
+
+   /* Static IP assignment */
+#if  (( LWIP_DHCP && 0 ))
+   IP4_ADDR(&gw, 0, 0, 0, 0);
+   IP4_ADDR(&ipaddr, 0, 0, 0, 0);
+   IP4_ADDR(&netmask, 0, 0, 0, 0);
+#else
+   /* https://en.wikipedia.org/wiki/Reserved_IP_addresses#IPv4 */
+   IP4_ADDR(&gw, 0,0,0,0);
+   IP4_ADDR(&ipaddr, 198,18,0,10);
+   IP4_ADDR(&netmask, 255, 255, 255, 0);
+#endif
+
+   /* Add netif interface for lpc17xx_8x */
+   netif_add(&ctk_slipif, &ipaddr, &netmask, &gw, NULL, slipif_init, ctk_br_input);
 
 //   netif_create_ip6_linklocal_address(&ctk_slipif, 0); // if != 0, assume hwadr is a 48-bit MAC address (std conversion)
 
