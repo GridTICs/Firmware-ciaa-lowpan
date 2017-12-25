@@ -72,10 +72,6 @@
 
 #include "ciaaLibs_CircBuf.h"
 
-// test
-#include <stdio.h>
-#include<stdarg.h>
-
 /*==================[macros and definitions]=================================*/
 
 /*==================[internal data declaration]==============================*/
@@ -97,12 +93,12 @@ static int32_t fd_usb_uart;
  */
 static int32_t fd_rs232;
 
-/* sio_id */
+/* sio_id for Slip Device */
 static u8_t sio_devnum;
 
-static unsigned int repeat_show = 1;
 #define LIM_SHOW_COUNTER	30
-static unsigned int show_counter = 0;
+static unsigned int repeat_show = 1;  /* How many times ip6 address should be shown? */
+static unsigned int show_counter = 0; /* Should the counter be shown */
 /*==================[external data definition]===============================*/
 
 /*==================[internal functions definition]==========================*/
@@ -125,10 +121,13 @@ void ErrorHook(void)
    ciaaPOSIX_printf("ErrorHook was called\n");
    ciaaPOSIX_printf("Service: %d, P1: %d, P2: %d, P3: %d, RET: %d\n", OSErrorGetServiceId(), OSErrorGetParam1(), OSErrorGetParam2(), OSErrorGetParam3(), OSErrorGetRet());
 
-   ciaaPOSIX_printf("SystemReset...\n");
+   ciaaPOSIX_printf("SystemReset\n");
 
 #if (( GWIOT_ASSERT_RESET == 1 ))
+   ciaaPOSIX_printf("calling NVIC_SystemReset()\n");
    NVIC_SystemReset();
+#else
+   ciaaPOSIX_printf("Disabled\n");
 #endif
    ShutdownOS(0);
 }
@@ -167,12 +166,7 @@ TASK(InitTask)
    load_sio_id(&sio_devnum);
    ciaaDriverSlip_init();
 
-   /* TODO reenviar sio_devnum a ciaaDriverEth.c y desde ahí levantar una netif */
-
    char message[] = "Waiting for characters at port";
-   // ciaaPOSIX_write(fd_usb_uart, message, ciaaPOSIX_strlen(message));
-   // ciaaPOSIX_printf( message );
-   // dbg_send(message, ciaaPOSIX_strlen(message));
 
    ciaaPOSIX_printf("\nBuild date %s %s", __DATE__, __TIME__);
    ciaaPOSIX_printf("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d\n",

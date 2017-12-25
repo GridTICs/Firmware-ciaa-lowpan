@@ -43,10 +43,10 @@
 
 #include "ciaaPOSIX_stdio.h"
 
-/* envio bloqueante por UART */
+/* envio bloqueante por UART - no recomendado salvo invasión zombie */
 #define SENDBLOCK 0
 #if SENDBLOCK
-/*  TODO traer desde las bibliotcas el s'imbolo LPC_USART2 para dejar
+/*  TODO traer desde las bibliotecas el símbolo LPC_USART2 para dejar
  * consistente con dbg_load_uart */
 
 #ifdef FALSE
@@ -107,39 +107,3 @@ void dbg_printf(const char * const fmt, ...)
    return;
 }
 
-
-#if 0
-/* https://github.com/pridolfi/workspace/blob/2026e088f18d138a2060907de58e5b4464289d29/examples/tcpecho/inc/newlib_stubs.h */
-/*
- write
- Write a character to a file. `libc' subroutines will use this system routine for output to all files, including stdout
- Returns -1 on error or number of bytes sent
- */
-int _write(int file, char *ptr, int len) {
-    int n;
-    switch (file) {
-	    case STDOUT_FILENO: /*stdout*/
-	        for (n = 0; n < len; n++) {
-	            Chip_UART_SendBlocking(MYSTDOUT, ptr, 1);
-	            ptr++;
-	        }
-	        break;
-	    case STDERR_FILENO: /* stderr */
-	        for (n = 0; n < len; n++) {
-	        	Chip_UART_SendBlocking(MYSTDERR, ptr, 1);
-				ptr++;
-	        }
-	        break;
-	    default:
-	        errno = EBADF;
-	        return -1;
-    }
-    return len;
-}
-
-// FIXME
-/*
-   ciaaDevices_deviceType * device;
-   device = ciaaDevices_getDevice(path);
-*/
-#endif

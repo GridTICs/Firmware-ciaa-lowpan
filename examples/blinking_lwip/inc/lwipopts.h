@@ -2311,6 +2311,12 @@
  * @}
  */
 
+
+/**
+ * @defgroup lwip_lpc4337 Debugging
+ * @ingroup lwip
+ * @{
+ */
 /**
  * This define is custom for the LPC EMAC driver. Enabled it to
  *  get debug messages for the driver
@@ -2319,10 +2325,14 @@
 
 
 /**
- * Gateway IoT
+ * Gateway IoT: system debuggin messages
  */
  #define	LWIP_GWIOT		LWIP_DBG_OFF
 
+
+/**
+ * gridtcs Gateway IoT: reset board on assert
+ */
 #define GWIOT_ASSERT_RESET	0
 
 /**
