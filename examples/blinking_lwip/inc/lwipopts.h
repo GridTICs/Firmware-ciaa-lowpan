@@ -2326,6 +2326,11 @@
 #define GWIOT_ASSERT_RESET	0
 
 /**
+ * gridtcs Gateway IoT: TCP listening port
+ */
+#define GWIOT_LISTEN_PORT	8000
+
+/**
  * @}
  */
 

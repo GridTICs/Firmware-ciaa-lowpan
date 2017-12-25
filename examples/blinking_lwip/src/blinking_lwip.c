@@ -175,15 +175,15 @@ TASK(InitTask)
    // dbg_send(message, ciaaPOSIX_strlen(message));
 
    ciaaPOSIX_printf("\nBuild date %s %s", __DATE__, __TIME__);
-#if ( OSEKMEM == 1 )
-   ciaaPOSIX_printf("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d - usando memoria posix dinamica\n",
-#else
-   ciaaPOSIX_printf("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d - usando memoria estatica\n",
-#endif
+   ciaaPOSIX_printf("\nLwIP Version %d.%d.%d-%d DHCP %d\n%s %d\n",
       LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR, LWIP_VERSION_REVISION,
       LWIP_VERSION_RC, LWIP_DHCP,
-      message, 8000);
-
+      message, GWIOT_LISTEN_PORT);
+#if ( OSEKMEM == 1 )
+   ciaaPOSIX_printf("usando memoria posix-ciaa dinamica\n");
+#else
+   ciaaPOSIX_printf("usando memoria estatica\n");
+#endif
 
    ciaaPOSIX_printf("SetRelAlarm(ActivateBlinkTask, 250, 250);\n");
    /* set blinky task */

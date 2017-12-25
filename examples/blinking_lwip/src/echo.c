@@ -85,7 +85,7 @@ echo_init(void)
   {
     err_t err;
 
-    err = tcp_bind(echo_pcb, IP_ANY_TYPE, 8000);
+    err = tcp_bind(echo_pcb, IP_ANY_TYPE, GWIOT_LISTEN_PORT);
     if (err == ERR_OK)
     {
       echo_pcb = tcp_listen(echo_pcb);
