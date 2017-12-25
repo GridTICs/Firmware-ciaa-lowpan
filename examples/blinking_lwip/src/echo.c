@@ -295,11 +295,6 @@ echo_send(struct tcp_pcb *tpcb, struct echo_state *es)
   {
   ptr = es->p;
 
-#ifdef LWIP_HOOK_IP4_INPUT
-  /* recojo informacion del buffer circular */
-  rs232_fetch(ptr->payload, ptr->len);
-#endif
-
   /* enqueue data for transmission */
   wr_err = tcp_write(tpcb, ptr->payload, ptr->len, 1);
   if (wr_err == ERR_OK)
