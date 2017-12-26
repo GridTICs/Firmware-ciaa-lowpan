@@ -51,6 +51,7 @@ MODS ?= modules$(DS)posix           \
         modules$(DS)drivers         \
         modules$(DS)rtos            \
         modules$(DS)libs            \
+        modules$(DS)gtgwiot            \
         externals$(DS)lwip
 
 # para printf y debug
