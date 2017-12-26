@@ -246,7 +246,14 @@ TASK(PeriodicTask)
          show_counter = 0;
       }
 
-      /* lwip stack periodic loop */
+      /* lwip slip stack periodic loop */
+      ciaaDriverSlipmainFunction();
+      /* lwip ethernet stack periodic loop */
+      ciaaDriverEth_mainFunction();
+
+      /* lwip slip stack periodic loop */
+      ciaaDriverSlipmainFunction();
+      /* lwip ethernet stack periodic loop */
       ciaaDriverEth_mainFunction();
 
       Schedule();

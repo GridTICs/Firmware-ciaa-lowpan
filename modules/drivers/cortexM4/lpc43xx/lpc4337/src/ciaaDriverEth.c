@@ -284,14 +284,13 @@ void ciaaDriverEth_init(void)
 
 void ciaaDriverSlipmainFunction(void)
 {
-   ;
+   /* slip queue */
+   slipif_poll(&ctk_slipif);
+
 }
 
 void ciaaDriverEth_mainFunction(void)
 {
-
-   /* slip queue */
-   slipif_poll(&ctk_slipif);
 
    /* Handle packets as part of this loop, not in the IRQ handler */
    lpc_enetif_input(&lpc_netif);
