@@ -20,7 +20,7 @@ struct sio_match {
 static struct sio_match sio_m[NUMSIODEVS];
 
 /**
- * recoger el id de que responde a ese descriptor de archivo
+ * fetchs file descriptor's id for fd_posix
  */
 u8_t sioPOSIX_get_id(int32_t * fd_posix)
 {
@@ -35,7 +35,7 @@ u8_t sioPOSIX_get_id(int32_t * fd_posix)
 }
 
 /**
- * cargar a memoria local el descriptor de archivo
+ * Loads in local memory file descriptor
  */
 u8_t sioPOSIX_load_fd(int32_t * fd_pos)
 {
@@ -53,14 +53,14 @@ u8_t sioPOSIX_load_fd(int32_t * fd_pos)
 
 /**
  * Opens a serial device for communication.
+ * Actual file opening must be done previously via sioPOSIX_load_fd()
  *
  * @param devnum device number
  * @return handle to serial device if successful, NULL otherwise
  */
 sio_fd_t sio_open(u8_t devnum)
 {
-   // la apartura real del dispositivo debería estar hecha previamente y cargada vía sioPOSIX_load_fd()
-   /// FIXME forzar que el modo de operaci'on sea no bloqueante
+   /// Forces non blocking mode
    ciaaPOSIX_ioctl(*sio_m[ devnum-1 ].fdposix, ciaaPOSIX_IOCTL_SET_NONBLOCK_MODE, (void*)true);
    return (sio_fd_t)sio_m[ devnum-1 ].fdposix;
 }
@@ -75,7 +75,7 @@ sio_fd_t sio_open(u8_t devnum)
  */
 void sio_send(u8_t c, sio_fd_t fdp)
 {
-   (void) ciaaPOSIX_write( *((int32_t *)fdp), &c, 1);
+   (void) ciaaPOSIX_write( *((int32_t *)fdp), &c, 1 );
    return;
 }
 
@@ -109,7 +109,7 @@ ssize_t giot_sio_read(sio_fd_t fdp, u8_t *data, u32_t len)
    bool * upoll = & sio_m[ id-1 ].uart_poll;
    *upoll = true;
 
-   // bloqueante
+   // blocking
    while ( r_len == 0 && *upoll == true ) {
       r_len = ciaaPOSIX_read(*((int32_t *) fdp), data, len);
    }

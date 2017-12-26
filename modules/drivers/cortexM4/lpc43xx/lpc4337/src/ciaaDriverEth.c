@@ -181,7 +181,8 @@ void ciaaDriverSlip_init(void)
    /* FIXME get a way for removing ip4 dependency */
    netif_add(&ctk_slipif, &ipaddr, &netmask, &gw, NULL, slipif_init, ctk_br_input);
 
-//   netif_create_ip6_linklocal_address(&ctk_slipif, 0); // if != 0, assume hwadr is a 48-bit MAC address (std conversion)
+   /* if != 0, assume hwadr is a 48-bit MAC address (std conversion) */
+   // netif_create_ip6_linklocal_address(&ctk_slipif, 0);
 
    paddr6 = &addr6;
    IP6_ADDR(paddr6,
