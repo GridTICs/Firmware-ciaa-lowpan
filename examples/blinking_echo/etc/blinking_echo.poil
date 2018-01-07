@@ -98,13 +98,6 @@ ALARM ActivatePeriodicTask {
     }
 }
 
-ALARM ActivateSerialEchoTask {
-    COUNTER = SoftwareCounter;
-    ACTION = ACTIVATETASK {
-        TASK = SerialEchoTask;
-    }
-}
-
 RESOURCE = POSIXR;
 
 EVENT = POSIXE;

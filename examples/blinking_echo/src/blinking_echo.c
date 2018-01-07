@@ -96,7 +96,7 @@ static int32_t fd_out;
  *
  * Device path /dev/serial/uart/1
  */
-static int32_t fd_usb_uart;
+static int32_t fd_uart1;
 
 /** \brief File descriptor of the RS232 uart
  *
@@ -176,16 +176,16 @@ TASK(InitTask)
    fd_out = ciaaPOSIX_open("/dev/dio/out/0", ciaaPOSIX_O_RDWR);
 
    /* open UART connected to USB bridge (FT2232) */
-   fd_usb_uart = ciaaPOSIX_open("/dev/serial/uart/1", ciaaPOSIX_O_RDWR);
+   fd_uart1 = ciaaPOSIX_open("/dev/serial/uart/1", ciaaPOSIX_O_RDWR);
 
    /* open UART connected to RS232 connector */
    fd_uart2 = ciaaPOSIX_open("/dev/serial/uart/2", ciaaPOSIX_O_RDWR);
 
    /* change baud rate for uart usb */
-   ciaaPOSIX_ioctl(fd_usb_uart, ciaaPOSIX_IOCTL_SET_BAUDRATE, (void *)ciaaBAUDRATE_115200);
+   ciaaPOSIX_ioctl(fd_uart1, ciaaPOSIX_IOCTL_SET_BAUDRATE, (void *)ciaaBAUDRATE_115200);
 
    /* change FIFO TRIGGER LEVEL for uart usb */
-   ciaaPOSIX_ioctl(fd_usb_uart, ciaaPOSIX_IOCTL_SET_FIFO_TRIGGER_LEVEL, (void *)ciaaFIFO_TRIGGER_LEVEL3);
+   ciaaPOSIX_ioctl(fd_uart1, ciaaPOSIX_IOCTL_SET_FIFO_TRIGGER_LEVEL, (void *)ciaaFIFO_TRIGGER_LEVEL3);
 
    /* activate example tasks */
    Periodic_Task_Counter = 0;
@@ -193,7 +193,6 @@ TASK(InitTask)
 
    /* Activates the SerialEchoTask task */
    ActivateTask(SerialEchoTask);
-//   SetRelAlarm(SerialEchoTask, 100, 50);
 
    /* end InitTask */
    TerminateTask();
@@ -201,8 +200,8 @@ TASK(InitTask)
 
 /** \brief Serial Echo Task
  *
- * This tasks waits for input data from fd_usb_uart and writes the received data
- * to fd_usb_uart and fd_uart2. This taks alos blinkgs the output 5.
+ * This tasks waits for input data from fd_uart1 and writes the received data
+ * to fd_uart1 and fd_uart2. This taks alos blinkgs the output 5.
  *
  */
 TASK(SerialEchoTask)
@@ -214,22 +213,17 @@ TASK(SerialEchoTask)
    ciaaPOSIX_printf("SerialEchoTask...\n");
    /* send a message to the world :) */
    char message[] = "Hi! :)\nSerialEchoTask: Waiting for characters...\n";
-   static int i = 0;
-   if(i == 0)
-   {
-     ciaaPOSIX_write(fd_usb_uart, message, ciaaPOSIX_strlen(message));
-     i = 1;
-   }
+   ciaaPOSIX_write(fd_uart1, message, ciaaPOSIX_strlen(message));
 
-   if(1)
+   while(1)
    {
       /* wait for any character ... */
-      ret = ciaaPOSIX_read(fd_usb_uart, buf, 20);
+      ret = ciaaPOSIX_read(fd_uart1, buf, 20);
 
       if(ret > 0)
       {
          /* ... and write them to the same device */
-         ciaaPOSIX_write(fd_usb_uart, buf, ret);
+         ciaaPOSIX_write(fd_uart1, buf, ret);
 
          /* also write them to the other device */
          ciaaPOSIX_write(fd_uart2, buf, ret);
@@ -240,10 +234,6 @@ TASK(SerialEchoTask)
       outputs ^= 0x20;
       ciaaPOSIX_write(fd_out, &outputs, 1);
    }
-   /* end PeriodicTask */
-   SetRelAlarm(SerialEchoTask, 1, 0);
-   TerminateTask();
-//   ChainTask(SerialEchoTask);
 }
 
 /** \brief Periodic Task
