@@ -919,6 +919,9 @@ void Board_ENET_GetMacADDR(uint8_t *mcaddr)
    /* TODO FIXME!! Get MAC address from I2C memory!! */
 	uint8_t boardmac[] = {0x00, 0x60, 0x37, 0x12, 0x34, 0x56};
 
+#ifdef CUSTOM_EMAC_ADDRESS
+	lpc_gen_mac(boardmac);
+#endif
 	memcpy(mcaddr, boardmac, 6);
 }
 

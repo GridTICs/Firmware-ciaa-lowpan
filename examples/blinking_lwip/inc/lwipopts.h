@@ -2323,6 +2323,15 @@
  */
 #define EMAC_DEBUG                       LWIP_DBG_OFF
 
+/* Custom MAC address based on IAP UID */
+#define	MAC_ADD_IAP	0x0001
+
+/* Custom MAC address based on i2c Memory */
+#define	MAC_ADD_I2C	0x0002
+
+/* Use a custom unique MAC address (comment for disabling) */
+#define CUSTOM_EMAC_ADDRESS	MAC_ADD_IAP
+
 
 /**
  * Gateway IoT: system debuggin messages

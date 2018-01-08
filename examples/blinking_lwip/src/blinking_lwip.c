@@ -70,6 +70,8 @@
 #include "blinking_lwip.h"    /* <= own header */
 #include "ciaaDriverEth.h"    /* <= header for ciaaDriverEth_mainFunction() */
 
+#include "arch/lpc_gen_mac.h" /* lpc4337_gen_mac_IAP_ReadUID and gen_mac */
+
 #include "ciaaLibs_CircBuf.h"
 
 /*==================[macros and definitions]=================================*/
@@ -134,6 +136,8 @@ void ErrorHook(void)
 
 TASK(InitTask)
 {
+   uint32_t uid[5];
+
    ciaaPOSIX_printf("ciaak_start()\n");
    /* init CIAA kernel and devices */
    ciaak_start();
@@ -178,6 +182,27 @@ TASK(InitTask)
 #else
    ciaaPOSIX_printf("usando memoria estatica\n");
 #endif
+
+   lpc4337_gen_mac_IAP_ReadUID(uid);
+   // 8-4-4-4-12
+   ciaaPOSIX_printf("UUID %08X-%04X-%04X-%04X-%04X%08X\n",
+       uid[0],
+       ((uid[1]&0xffff0000)>>16),
+       (uid[1]&0x0000ffff),
+       ((uid[2]&0xffff0000)>>16),
+       (uid[2]&0x0000ffff),
+       uid[3]
+    );
+
+   ciaaPOSIX_printf("Serial Number: %08X %08X %08X %08X %08X\n",
+       uid[0], uid[1], uid[2], uid[3], uid[4]);
+   ciaaPOSIX_printf("               %lu-%lu-%lu-%lu-%lu\n",
+       uid[0], uid[1], uid[2], uid[3], uid[4]);
+
+   uint8_t m[6];
+   lpc_gen_mac(m);
+   ciaaPOSIX_printf("Ethernet MAC Address: %02X:%02X:%02X:%02X:%02X:%02X\n",
+       m[0], m[1], m[2], m[3], m[4], m[5]);
 
    ciaaPOSIX_printf("SetRelAlarm(ActivateBlinkTask, 250, 250);\n");
    /* set blinky task */
